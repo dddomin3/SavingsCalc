@@ -395,7 +395,7 @@ if (-e "HistoryConsole.csv")
 		{
 			for (my $x=0; $x <= $counter; $x++) #for the length of the 1st row, match the given "parameter name" and spit out the corresponding column number (where column "A" = 1, "B" = 2...
 			{
-				if($info[$x] =~ m/Event ID/ )
+				if($info[$x] =~ m/Event ID/ || $info[$x] =~ m/TicketID/ || $info[$x] =~ m/Ticket ID/ || $info[$x] =~ m/TicketId/)
 				{
 					$a=$x;
 					chomp ($info[$x]);
@@ -413,13 +413,13 @@ if (-e "HistoryConsole.csv")
 					chomp ($info[$x]);
 					push @header, $x;
 				}
-				if($info[$x] =~ m/Created Time/) #### $d
+				if($info[$x] =~ m/Created Time/ || $info[$x] =~ m/CreatedTime/) #### $d
 				{
 					$d=$x;
 					chomp ($info[$x]);
 					push @header, $x;
 				}
-				if($info[$x] =~ m/SetClosedTime/) #### $e
+				if($info[$x] =~ m/SetClosedTime/ || $info[$x] =~ m/Set Closed Time/ || $info[$x] =~ m/SetClosed Time/ || $info[$x] =~ m/ClosedTime/ || $info[$x] =~ m/Closed Time/) #### $e
 				{
 					$e=$x;
 					chomp ($info[$x]);
@@ -476,7 +476,7 @@ if (-e "HistoryConsole.csv")
 			
 
 		}
-		if ( $num>1 && ($info[$a] ne "") && ($info[$a] ne "Event ID") ) #if the column does NOT say "Event ID" and is NOT blank (""), then the row should be a legit Ticket && ($info[$a] ne "") && ($info[$a] ne "Event ID")
+		if ( $num>1 && ($info[$a] ne "") && ($info[$a] ne "Event ID") && ($info[$a] ne "TicketID") && ($info[$a] ne "Ticket ID") && ($info[$a] ne "TicketId")) #if the column does NOT say "Event ID" and is NOT blank (""), then the row should be a legit Ticket && ($info[$a] ne "") && ($info[$a] ne "Event ID")
 		{
 		
 			######Time/Date formatting Section, does not round time, but converts it into the standard: "YYYY-MM-DDT00:00:00" format######
@@ -4671,3 +4671,4 @@ print Dumper \%ahuhash;
 close (TOT);
 close($dbg);
 close($ft);
+
