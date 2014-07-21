@@ -1,0 +1,9 @@
+Event ID,,,Facility,,,Asset,,,Created Time,,,SetClosedTime,,,Anomaly,,,Status,,,Cause,,,Effect,,,Source,,,ReturnStatus,,,Comments
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+MCD-0116956,,,Hamburger University,,,AHU2,,,"Feb 28, 2014 22:28:11 CST",,,"Mar 07, 2014 15:21:20 CST",,,Leaky Valve,,,Closed,,,,,,,,,Analytic,,,Good Feedback,,,"We found the AHU to be hunting, I changed out a bad damper actuator, we also adjusted the AHU fan % offset "
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+MCD-0122473,,,Hamburger University,,,AHU1,,,"Mar 28, 2014  10:41:00 CDT",,,"Apr 28, 2014  1:43:00 CDT",,,Stuck Damper,,,Closed,,,,,,,,,Analytic,,,Good Feedback,,,Honeywell found a bad 
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+MCD-0131131,,,Hamburger University,,,AHU1,,,"May 09, 2014 14:33:30 CDT",,,"May 13, 2014 08:33:17 CDT",,,DAT Below Set Point - Cooling Control Logic Failure,,,Closed,,,,,,,,,Analytic,,,Good Feedback,,,The AHU cooling valve was set to 50% needed to be in auto operation.
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+MCD-0131513,,,Hamburger University,,,AHU4,,,"May 09, 2014 23:08:17 CDT",,,"May 16, 2014 10:25:19 CDT",,,Leaky Damper,,,Closed,,,,,,,,,Analytic,,,Good Feedback,,,"Checked outside air dampers and return dampers and are functioning properly at this time, have watched over last couple days. The min.air dampers are open 100% when the outside dampers are closed in this part of the AHU. Will continue to watch damper operation."
