@@ -769,7 +769,7 @@ if(-e "global.csv")
 		while ($laziness =~ s/,,/,NULL,/g){}; #replace empty values with NULL for future treatment
 		if($laziness =~ m/\(/)	#If there is another parenthesis, replace data with NULL.
 		{
-			$laziness =~ s/[^,]*?\(.*?\),/NULL,/g; #TODO: Make sure this works correctly
+			$laziness =~ s/[^,]*?\(.*?\),/NULL,/g;
 		} 
 		#print CONV $laziness; #if nothing wrong with line, add it to converted file.
 #----------Hash Population----------V
@@ -976,7 +976,7 @@ while (my $inputfile = readdir(DIR))
 		while ($laziness =~ s/,,/,NULL,/g){}; #replace empty values with NULL for future treatment
 		if($laziness =~ m/\(/)	#If there is another parenthesis, replace data with NULL.
 		{
-			$laziness =~ s/[^,]*?\(.*?\),/NULL,/g; #TODO: Make sure this works correctly
+			$laziness =~ s/[^,]*?\(.*?\),/NULL,/g; 
 		} 
 		#print CONV $laziness; #if nothing wrong with line, add it to converted file.
 #----------Hash Population----------V
@@ -2026,7 +2026,6 @@ while (my $inputfile = readdir(DIR))
 	sub OutofOcc #Dennis Approved i think?
 	#use this:	&OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM))
 	#working
-	#TODO: add the time delay to the validation check - meh, being applied to tickets kinda fixes that
 	{
 		my $i = $_[0];
 		my $CFM = $_[1];
@@ -2735,7 +2734,6 @@ while (my $inputfile = readdir(DIR))
 	sub DSPDev #Dennis Approved, thank god we have ONE FUCKING SIMPLE ANALYTIC, gdamn. And its cuz we fudged stuff, eguhh
 	#use this:	&DSPDev($i, &REALLYMakeVFD($i, $MaxCFM))
 	#working
-	#TODO: add the time delay to the validation check - meh, being applied to tickets kinda fixes that
 	#will return a hash of savings per time stamp
 	{
 		my $i = $_[0];
@@ -3064,7 +3062,6 @@ while (my $inputfile = readdir(DIR))
 
 	sub LeakyVlv #good to go!!
 		#use this:	&LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM))
-		#TODO: add the time delay to the validation check - meh, being applied to tickets kinda fixes that
 	{
 		my $i = $_[0];
 		my $CFM = $_[1];
