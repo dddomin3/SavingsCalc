@@ -5,6 +5,8 @@
 
 open(my $dbg, '>', 'dbg.txt') or die "Could not open file";	#for dumpers since DateTime is fucking annoying, goddamn
 open(my $ft, '>', 'HistoryConsole_save.pl');
+open(my $ooo, '>', 'outofocc_save.pl');
+print $ooo "Timestamp,CalcSFS,SFS,HP,kWHP,CalcVFD,SupVFD,elecsave,active\n";
 
 use warnings "all";
 use strict;
@@ -723,13 +725,12 @@ if(-e "AHUinfo.csv")
 			}
 			else
 			{
-				$h1{$infocol[$i]} = $1;
+				$AHUinfo{$infoSITE}{$infoAHU}{$infocol[$i]} = $1;
 			}
 			$i++;
 		}
 		#print "\n";
 #		$h2{$infoAHU} = \%h1;
-		$AHUinfo{$infoSITE}{$infoAHU} = \%h1;
 	}
 	$excel = 0;
 }
@@ -1352,7 +1353,7 @@ while (my $inputfile = readdir(DIR))
 
 	#Per AHU Constants
 	my $MaxCFM = $AHUinfo{$sitename}{$AHUname}{"MaxCFM"}; #CFMs
-	my $HP = $AHUinfo{$sitename}{$AHUname}{"HP"};
+	our $HP = $AHUinfo{$sitename}{$AHUname}{"HP"};
 
 	
 	my $OADminSig = $AHUinfo{$sitename}{$AHUname}{"OADminSig"};
@@ -2074,15 +2075,17 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
+						
 		my %active = (
 			"SCH" => ( looks_like_number($SCH[$i]) > 0),
 			"SFS" => ( looks_like_number(&FanOn($i)) > 0)
 		);
-		
+		print $ooo $AHU{"TT"}[$i].",".FanOn($i).",".$AHU{"SFS"}[$i].",".$HP.",".$kWHP.",".$VFD.",".$AHU{"SupVFD1"}[$i];
 		foreach my $key (keys %active)
 		{
 			unless ($active{$key})	#if any are false
 			{
+				print $ooo ",0,0\n";
 				return %savings;
 			}
 		}
@@ -2091,6 +2094,7 @@ while (my $inputfile = readdir(DIR))
 		
 		unless ($active{"VFD"}||$active{"CFM"})	#if both are false. DeMorgans ftw
 		{
+			print $ooo ",0,0\n";
 			return %savings;
 		}
 		
@@ -2160,6 +2164,7 @@ while (my $inputfile = readdir(DIR))
 		{
 			$AHUmap->setvta($valve, $realta{$valve});
 		}
+		print $ooo ",".$savings{"elec"}.",".$savings{"active"}."\n";
 		return %savings;
 	}
 
@@ -3337,6 +3342,7 @@ while (my $inputfile = readdir(DIR))
 					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Overage Running Hours/)
 					|| (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
+						print $ooo $AHUname."\n";
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
@@ -3691,6 +3697,7 @@ while (my $inputfile = readdir(DIR))
 					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Overage Running Hours/)
 					|| (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
+						print $ooo $AHUname."\n";
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
@@ -4233,13 +4240,14 @@ while (my $inputfile = readdir(DIR))
 	
 	foreach my $monthspaceyear (keys %monthlyTicketCounts)
 	{
-		if($monthspaceyear =~ m/"^0*$currentmonth $cyear"/)
-		{
-			$cmc += $monthlyTicketCounts{$monthspaceyear}{"CompletedCount"}; $cmo += $monthlyTicketCounts{$monthspaceyear}{"OutstandingCount"}; 
-			$cmcsave += $monthlyTicketCounts{$monthspaceyear}{"CompletedValue"}; $cmosave += $monthlyTicketCounts{$monthspaceyear}{"OutstandingValue"};
-			$lifec += $monthlyTicketCounts{$monthspaceyear}{"CompletedCount"}; $lifeo += $monthlyTicketCounts{$monthspaceyear}{"OutstandingCount"}; 
-			$lifecsave += $monthlyTicketCounts{$monthspaceyear}{"CompletedValue"};  $lifeosave += $monthlyTicketCounts{$monthspaceyear}{"OutstandingCount"}; 
-		}
+		if($monthspaceyear eq "0$currentmonth $cyear") #Joe temporary fix, def wont work for tickets for currentmonth = OCT, NOV, DEC
+        {
+            $cmc += $monthlyTicketCounts{$monthspaceyear}{"CompletedCount"}; $cmo += $monthlyTicketCounts{$monthspaceyear}{"OutstandingCount"}; 
+            $cmcsave += $monthlyTicketCounts{$monthspaceyear}{"CompletedValue"}; $cmosave += $monthlyTicketCounts{$monthspaceyear}{"OutstandingValue"};
+            $lifec += $monthlyTicketCounts{$monthspaceyear}{"CompletedCount"}; $lifeo += $monthlyTicketCounts{$monthspaceyear}{"OutstandingCount"}; 
+            $lifecsave += $monthlyTicketCounts{$monthspaceyear}{"CompletedValue"};  $lifeosave += $monthlyTicketCounts{$monthspaceyear}{"OutstandingValue"}; 
+            print "made it in!";
+        }
 		else
 		{
 			$pmc += $monthlyTicketCounts{$monthspaceyear}{"CompletedCount"}; $pmo += $monthlyTicketCounts{$monthspaceyear}{"OutstandingCount"};  
