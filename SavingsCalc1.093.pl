@@ -6,7 +6,7 @@
 open(my $dbg, '>', 'dbg.txt') or die "Could not open file";	#for dumpers since DateTime is fucking annoying, goddamn
 open(my $ft, '>', 'HistoryConsole_save.pl');
 open(my $ooo, '>', 'outofocc_save.pl');
-print $ooo "Timestamp,CalcSFS,SFS,HP,kWHP,CalcVFD,SupVFD,elecsave,active\n";
+print $ooo "Timestamp,CalcSFS,SFS,SCH,HP,kWHP,CalcVFD,SupVFD,elecsave,active\n";
 
 use warnings "all";
 use strict;
@@ -2080,7 +2080,7 @@ while (my $inputfile = readdir(DIR))
 			"SCH" => ( looks_like_number($SCH[$i]) > 0),
 			"SFS" => ( looks_like_number(&FanOn($i)) > 0)
 		);
-		print $ooo $AHU{"TT"}[$i].",".FanOn($i).",".$AHU{"SFS"}[$i].",".$HP.",".$kWHP.",".$VFD.",".$AHU{"SupVFD1"}[$i];
+		print $ooo $AHU{"TT"}[$i].",".FanOn($i).",".$AHU{"SFS"}[$i].",".$AHU{"SCH"}[$i].",".$HP.",".$kWHP.",".$VFD.",".$AHU{"SupVFD1"}[$i];
 		foreach my $key (keys %active)
 		{
 			unless ($active{$key})	#if any are false
