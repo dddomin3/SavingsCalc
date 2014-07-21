@@ -1314,56 +1314,56 @@ while (my $inputfile = readdir(DIR))
 	
 	
 	#From AHU/Standard Naming
-	my @SFS = SetPlainArray("SFS");
-	my @SCH = SetPlainArray("SCH");
-	my @OCC = SetPlainArray("OCC");
+	our @SFS = SetPlainArray("SFS");
+	our @SCH = SetPlainArray("SCH");
+	our @OCC = SetPlainArray("OCC");
 	
 	#Valves
 	
 	#Dampers
-	my @OAD = SetPlainArray("OAD");
-	my @RAD = SetPlainArray("RAD");
-	my @EAD = SetPlainArray("EAD");
-	my @MAD = SetPlainArray("MAD");
+	our @OAD = SetPlainArray("OAD");
+	our @RAD = SetPlainArray("RAD");
+	our @EAD = SetPlainArray("EAD");
+	our @MAD = SetPlainArray("MAD");
 	#Lonely temps
-	my @MAT = SetPlainArray("MAT");	
-	my @PHT = SetPlainArray("PHT");
+	our @MAT = SetPlainArray("MAT");	
+	our @PHT = SetPlainArray("PHT");
 	
 	#Paired temps/enthalpies
-	my @SAT = SetPlainArray("SAT");
-		my @SATSP = SetPlainArray("SATSP");
-	my @RAT = SetPlainArray("RAT");
-		my @RAE = SetPlainArray("RAE");
+	our @SAT = SetPlainArray("SAT");
+		our @SATSP = SetPlainArray("SATSP");
+	our @RAT = SetPlainArray("RAT");
+		our @RAE = SetPlainArray("RAE");
 		
 	#The below will use AHUside OA sensors. If these are not defined, it will try to use the global values.
-	my @OAT = SetPlainArray("OAT");
-	my @OAE = SetPlainArray("OAE");
-	my @OAH = SetPlainArray("OAH");
+	our @OAT = SetPlainArray("OAT");
+	our @OAE = SetPlainArray("OAE");
+	our @OAH = SetPlainArray("OAH");
 
-	my @DSP = SetPlainArray("DSP");
-		my @DSPSP = SetPlainArray("DSPSP");
+	our @DSP = SetPlainArray("DSP");
+		our @DSPSP = SetPlainArray("DSPSP");
 		
 	#Conversion factors
-	my $ConvGas = looks_like_number($AHUinfo{$sitename}{$AHUname}{"ConvGas"}) ? $AHUinfo{$sitename}{$AHUname}{"ConvGas"} : 0;
-	my $ConvSteam = looks_like_number($AHUinfo{$sitename}{$AHUname}{"ConvSteam"}) ? $AHUinfo{$sitename}{$AHUname}{"ConvSteam"} : 0;
-	my $ConvElec = looks_like_number($AHUinfo{$sitename}{$AHUname}{"ConvElec"}) ? $AHUinfo{$sitename}{$AHUname}{"ConvElec"} : 0;
-	my $DollarGas = looks_like_number($AHUinfo{$sitename}{$AHUname}{"DollarGas"}) ? $AHUinfo{$sitename}{$AHUname}{"DollarGas"} : 0;
-	my $DollarSteam = looks_like_number($AHUinfo{$sitename}{$AHUname}{"DollarSteam"}) ? $AHUinfo{$sitename}{$AHUname}{"DollarSteam"} : 0;
-	my $DollarElec = looks_like_number($AHUinfo{$sitename}{$AHUname}{"DollarElec"}) ? $AHUinfo{$sitename}{$AHUname}{"DollarElec"} : 0;
+	our $ConvGas = looks_like_number($AHUinfo{$sitename}{$AHUname}{"ConvGas"}) ? $AHUinfo{$sitename}{$AHUname}{"ConvGas"} : 0;
+	our $ConvSteam = looks_like_number($AHUinfo{$sitename}{$AHUname}{"ConvSteam"}) ? $AHUinfo{$sitename}{$AHUname}{"ConvSteam"} : 0;
+	our $ConvElec = looks_like_number($AHUinfo{$sitename}{$AHUname}{"ConvElec"}) ? $AHUinfo{$sitename}{$AHUname}{"ConvElec"} : 0;
+	our $DollarGas = looks_like_number($AHUinfo{$sitename}{$AHUname}{"DollarGas"}) ? $AHUinfo{$sitename}{$AHUname}{"DollarGas"} : 0;
+	our $DollarSteam = looks_like_number($AHUinfo{$sitename}{$AHUname}{"DollarSteam"}) ? $AHUinfo{$sitename}{$AHUname}{"DollarSteam"} : 0;
+	our $DollarElec = looks_like_number($AHUinfo{$sitename}{$AHUname}{"DollarElec"}) ? $AHUinfo{$sitename}{$AHUname}{"DollarElec"} : 0;
 
 	#Per AHU Constants
-	my $MaxCFM = $AHUinfo{$sitename}{$AHUname}{"MaxCFM"}; #CFMs
+	our $MaxCFM = $AHUinfo{$sitename}{$AHUname}{"MaxCFM"}; #CFMs
 	our $HP = $AHUinfo{$sitename}{$AHUname}{"HP"};
 
 	
-	my $OADminSig = $AHUinfo{$sitename}{$AHUname}{"OADminSig"};
-		my $OADmaxSig = $AHUinfo{$sitename}{$AHUname}{"OADmaxSig"};
-	my $OADminPer = $AHUinfo{$sitename}{$AHUname}{"OADminPer"};
-		my $OADmaxPer = $AHUinfo{$sitename}{$AHUname}{"OADmaxPer"};
-	my $OADtb = $AHUinfo{$sitename}{$AHUname}{"OADtb"};
-		my $OADta = $AHUinfo{$sitename}{$AHUname}{"OADta"};
-	my $MADtb = $AHUinfo{$sitename}{$AHUname}{"MADtb"};
-		my $MADta = $AHUinfo{$sitename}{$AHUname}{"MADta"};
+	our $OADminSig = $AHUinfo{$sitename}{$AHUname}{"OADminSig"};
+		our $OADmaxSig = $AHUinfo{$sitename}{$AHUname}{"OADmaxSig"};
+	our $OADminPer = $AHUinfo{$sitename}{$AHUname}{"OADminPer"};
+		our $OADmaxPer = $AHUinfo{$sitename}{$AHUname}{"OADmaxPer"};
+	our $OADtb = $AHUinfo{$sitename}{$AHUname}{"OADtb"};
+		our $OADta = $AHUinfo{$sitename}{$AHUname}{"OADta"};
+	our $MADtb = $AHUinfo{$sitename}{$AHUname}{"MADtb"};
+		our $MADta = $AHUinfo{$sitename}{$AHUname}{"MADta"};
 	
 		
 	foreach my $name (keys(%AHU))
@@ -1472,32 +1472,32 @@ while (my $inputfile = readdir(DIR))
 	}
 	print Dumper (keys %AHU);
 	#}
-	my @MADtb = SetPlainArray($AHUinfo{$sitename}{$AHUname}{"MADtb"});		#this is cause im hot
-	my @MADta = SetPlainArray($AHUinfo{$sitename}{$AHUname}{"MADta"});		#this is cause im hot
-	my @OADtb = SetPlainArray($AHUinfo{$sitename}{$AHUname}{"OADtb"});		#this is cause this is cause
-	my @OADta = SetPlainArray($AHUinfo{$sitename}{$AHUname}{"OADta"});		#this is cause im hot
+	our @MADtb = SetPlainArray($AHUinfo{$sitename}{$AHUname}{"MADtb"});		#this is cause im hot
+	our @MADta = SetPlainArray($AHUinfo{$sitename}{$AHUname}{"MADta"});		#this is cause im hot
+	our @OADtb = SetPlainArray($AHUinfo{$sitename}{$AHUname}{"OADtb"});		#this is cause this is cause
+	our @OADta = SetPlainArray($AHUinfo{$sitename}{$AHUname}{"OADta"});		#this is cause im hot
 																					#no but its cause AHU{"NODExyz"} is now defined, so i've defined these here.
 																					#this should fix issues with future definitions
 	
-	my $DSPdb = $AHUinfo{$sitename}{$AHUname}{"DSPdb"};
+	our $DSPdb = $AHUinfo{$sitename}{$AHUname}{"DSPdb"};
 	
-	my $DATDev_Vlvdb = $AHUinfo{$sitename}{$AHUname}{"DATDev_Vlvdb"};
-	my $Leaky_Vlvdb = $AHUinfo{$sitename}{$AHUname}{"Leaky_Vlvdb"};
-	my $SimHC_Vlvdb = $AHUinfo{$sitename}{$AHUname}{"SimHC_Vlvdb"};
-	my $Econ_Vlvdb = $AHUinfo{$sitename}{$AHUname}{"Econ_Vlvdb"};
+	our $DATDev_Vlvdb = $AHUinfo{$sitename}{$AHUname}{"DATDev_Vlvdb"};
+	our $Leaky_Vlvdb = $AHUinfo{$sitename}{$AHUname}{"Leaky_Vlvdb"};
+	our $SimHC_Vlvdb = $AHUinfo{$sitename}{$AHUname}{"SimHC_Vlvdb"};
+	our $Econ_Vlvdb = $AHUinfo{$sitename}{$AHUname}{"Econ_Vlvdb"};
 	
-	my $DATDev_Tempdb = $AHUinfo{$sitename}{$AHUname}{"DATDev_Tempdb"};
-	my $Leaky_Tempdb = $AHUinfo{$sitename}{$AHUname}{"Leaky_Tempdb"};
-	my $SimHC_Tempdb = $AHUinfo{$sitename}{$AHUname}{"SimHC_Tempdb"};
-	my $Econ_Tempdb = $AHUinfo{$sitename}{$AHUname}{"Econ_Tempdb"};
+	our $DATDev_Tempdb = $AHUinfo{$sitename}{$AHUname}{"DATDev_Tempdb"};
+	our $Leaky_Tempdb = $AHUinfo{$sitename}{$AHUname}{"Leaky_Tempdb"};
+	our $SimHC_Tempdb = $AHUinfo{$sitename}{$AHUname}{"SimHC_Tempdb"};
+	our $Econ_Tempdb = $AHUinfo{$sitename}{$AHUname}{"Econ_Tempdb"};
 	
-	my $Leaky_Dampdb = $AHUinfo{$sitename}{$AHUname}{"Leaky_Dampdb"};
-	my $Econ_Dampdb = $AHUinfo{$sitename}{$AHUname}{"Econ_Dampdb"};
+	our $Leaky_Dampdb = $AHUinfo{$sitename}{$AHUname}{"Leaky_Dampdb"};
+	our $Econ_Dampdb = $AHUinfo{$sitename}{$AHUname}{"Econ_Dampdb"};
 	
-	my $Econ_Enthdb = $AHUinfo{$sitename}{$AHUname}{"Econ_Enthdb"};
-	my $Econ_EnthSP = $AHUinfo{$sitename}{$AHUname}{"Econ_EnthSP"};
+	our $Econ_Enthdb = $AHUinfo{$sitename}{$AHUname}{"Econ_Enthdb"};
+	our $Econ_EnthSP = $AHUinfo{$sitename}{$AHUname}{"Econ_EnthSP"};
 	
-	my $Econ_ClimateSP = $AHUinfo{$sitename}{$AHUname}{"Econ_ClimateSP"};
+	our $Econ_ClimateSP = $AHUinfo{$sitename}{$AHUname}{"Econ_ClimateSP"};
 	
 	##VVAnalytic Equations! They use a lot of the blood brain barrier things, so the should be here.VV
 	
