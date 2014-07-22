@@ -3420,7 +3420,7 @@ while (my $inputfile = readdir(DIR))
 					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/) 
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
 					{
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
@@ -3777,7 +3777,7 @@ while (my $inputfile = readdir(DIR))
 					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/) 
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
 					{
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
@@ -4671,4 +4671,3 @@ print Dumper \%ahuhash;
 close (TOT);
 close($dbg);
 close($ft);
-
