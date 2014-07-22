@@ -804,6 +804,11 @@ if(-e "global.csv")
 				hour => $3,	minute => $4, second => $5,
 				time_zone => $dst, 
 				);
+				
+				if( $tt->year != &Timeround($tt)->year)
+				{
+					$globalyear++;
+				}
 				$tt = &Timeround($tt);
 				if ($firsttime) 	#if first run, make it so it doesn't do any crazy timestamp things.
 				{
@@ -1010,6 +1015,11 @@ while (my $inputfile = readdir(DIR))
 				hour => $3,	minute => $4, second => $5,
 				time_zone => $dst, 
 				);
+				
+				if( $tt->year != &Timeround($tt)->year)
+				{
+					$thisyear++;
+				}
 				$tt = &Timeround($tt);
 				if ($firsttime) 	#if first run, make it so it doesn't do any crazy timestamp things.
 				{
