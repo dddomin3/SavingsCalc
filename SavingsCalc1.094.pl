@@ -455,7 +455,7 @@ if (-e "HistoryConsole.csv")
 					chomp ($info[$x]);
 					push @header, $x;
 				}
-				if($info[$x] =~  m/ReturnStatus/)
+				if($info[$x] =~  m/ReturnStatus/ || $info[$x] =~ m/Return Status/)
 				{
 					$k=$x;
 					chomp ($info[$x]);
@@ -3304,7 +3304,7 @@ while (my $inputfile = readdir(DIR))
 					if (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Below Set Point - Cooling/) 
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/) 
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Cooling event
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Cooling event
 					{
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
@@ -3325,6 +3325,33 @@ while (my $inputfile = readdir(DIR))
 						$newAnom = "DAT Deviation";
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
 					}
+					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
+					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
+					{
+						$newAnom = "DAT Deviation";
+						$anom = $newAnom;
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+					}
+					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Above Set Point - Cooling/)
+					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/)
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Greater/ ) )  ) #if it is DATDEV Cooling event, above set point. Cannot calculate savings and such, assign new anomaly.
+					{
+						$newAnom = "DAT Deviation";
+						$anom = $newAnom;
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+					}
+					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DSP Below Set Point/)
+					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/)
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Less/ ) )  ) #if it is DSPDev Below event. Cannot calculate savings and such, assign new anomaly.
+					{
+						$newAnom = "DSP Deviation";
+						$anom = $newAnom;
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+					}
+					
+					
+					
 					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Above Set Point - Heating/)
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
@@ -3619,6 +3646,7 @@ while (my $inputfile = readdir(DIR))
 							$equip{"Other Equipment"}{"Tickets"} += 1;
 						}
 						$AnnSumo += $AnnSum;
+						print "${$ticket}{$sitename}{$AHUname}{$ticketLevel} savings is $AnnSum\n";
 						##################################################################################
 						##################################################################################	
 						
@@ -3702,6 +3730,30 @@ while (my $inputfile = readdir(DIR))
 						$impday = $annualize{$sitename}{"DATDevH"};
 						print "impact days are $impday\n";
 						$newAnom = "DAT Deviation"; 
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+					}
+					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
+					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
+					{
+						$newAnom = "DAT Deviation";
+						$anom = $newAnom;
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+					}
+					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Above Set Point - Cooling/)
+					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/)
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Greater/ ) )  ) #if it is DATDEV Cooling event, above set point. Cannot calculate savings and such, assign new anomaly.
+					{
+						$newAnom = "DAT Deviation";
+						$anom = $newAnom;
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+					}
+					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DSP Below Set Point/)
+					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/)
+					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Less/ ) )  ) #if it is DSPDev Below event. Cannot calculate savings and such, assign new anomaly.
+					{
+						$newAnom = "DSP Deviation";
+						$anom = $newAnom;
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
 					}
 					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Overage Running Hours/)
@@ -3923,7 +3975,21 @@ while (my $inputfile = readdir(DIR))
 						
 						$AnnSum = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
 						$AnnSumi = $AnnSum;
-
+						if($AnnSum > 0)	#if the ticket is non-zero
+						{
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"TicketAge"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"TicketAge"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSum"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSumb"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnkWh"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"impday"} = $impday;
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeStart"} = $timeStart;
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeEnd"} = $timeEnd;
+						}
+						$AnnkWh += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
+						$Anngas += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
+						$Annsteam += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
 						#Total W.O.
 						$ticketcount += 1; #will have total number of tickets
 						#Algorithm
@@ -3939,7 +4005,16 @@ while (my $inputfile = readdir(DIR))
 							$alg{$newAnom}{"CompletedValue"} = 0; #value per analytic
 						}
 						#AHU
-						$ahuhash{$AHUname}{"Tickets"} += 1; #tickets per asset
+						if( exists($ahuhash{$AHUname}) )
+						{
+							$ahuhash{$AHUname}{"Tickets"} += 1; #tickets per asset
+						}
+						else 
+						{
+							$ahuhash{$AHUname}{"Tickets"} = 1; #tickets per anomaly
+							$ahuhash{$AHUname}{"OutstandingValue"} = 0; #value per analytic
+							$ahuhash{$AHUname}{"CompletedValue"} = 0; #value per analytic
+						}
 					
 						#Equipment
 						#big if statement to read (anomaly || (cause && effect) ) and assigns an equipment type. first if statement for AHU. Others for future equipment to be included. Not sure how to figure this out any other way right now.
@@ -3954,6 +4029,7 @@ while (my $inputfile = readdir(DIR))
 							$equip{"Other Equipment"}{"Tickets"} += 1;
 						}
 						$AnnSumo += $AnnSum;
+						print "${$ticket}{$sitename}{$AHUname}{$ticketLevel} savings is $AnnSum\n";
 						##################################################################################
 						##################################################################################
 					}
@@ -3969,8 +4045,18 @@ while (my $inputfile = readdir(DIR))
 							$alg{$anom}{"OutstandingValue"} = 0; #value per analytic
 							$alg{$anom}{"CompletedValue"} = 0; #value per analytic
 						}
-						$ahuhash{$AHUname}{"Tickets"} += 1;
+						if( exists($ahuhash{$AHUname}) )
+						{
+							$ahuhash{$AHUname}{"Tickets"} += 1; #tickets per asset
+						}
+						else 
+						{
+							$ahuhash{$AHUname}{"Tickets"} = 1; #tickets per anomaly
+							$ahuhash{$AHUname}{"OutstandingValue"} = 0; #value per analytic
+							$ahuhash{$AHUname}{"CompletedValue"} = 0; #value per analytic
+						}
 						$equip{"Air Handler (All)"}{"Tickets"} += 1; #ticket count
+						$equip{"Air Handler (All)"}{"Value"} += 0; #tickets' value $$$$$
 					}
 				}
 			}
@@ -4202,12 +4288,16 @@ while (my $inputfile = readdir(DIR))
 						$monthlyTicketCounts{$latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"timeStart"}->format_cldr("MM yyyy")}{"OutstandingValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 						$alg{$annaMolly}{"OutstandingValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 						$ahuhash{$AHUnamean}{"OutstandingValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
+						print "should be outstanding\n";
+						print $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
+						
 					}
 					else
 					{
 						$monthlyTicketCounts{$latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"timeStart"}->format_cldr("MM yyyy")}{"CompletedValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 						$ahuhash{$AHUnamean}{"CompletedValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 						$alg{$annaMolly}{"CompletedValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
+						print "in here!\n";
 					}
 				}
 				elsif($prevDeath < 0) {last;} #If it dies after the month, these tickets won't apply
@@ -4231,13 +4321,17 @@ while (my $inputfile = readdir(DIR))
 						$monthlyTicketCounts{$latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"timeStart"}->format_cldr("MM yyyy")}{"OutstandingValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 						$alg{$annaMolly}{"OutstandingValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 						$ahuhash{$AHUnamean}{"OutstandingValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
+						print "should be outstanding\n";
+						print $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 					}
 					else
 					{
 						$monthlyTicketCounts{$latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"timeStart"}->format_cldr("MM yyyy")}{"CompletedValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 						$ahuhash{$AHUnamean}{"CompletedValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 						$alg{$annaMolly}{"CompletedValue"} += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
+						print "in here!\n";
 					}
+					print $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"};
 				}
 				$prevDeath = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"TicketAge"} - $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"impday"};
 				print "PrevDeath is $prevDeath \n";
