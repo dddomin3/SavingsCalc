@@ -1514,7 +1514,7 @@ while (my $inputfile = readdir(DIR))
 	#			index ($i), $CFM
 	#		GLOBALS:
 	#			$AHUmap, %AHU, %AHUinfo
-	# RETURN: Hash REFERENCE of {"Point" -> Status} 
+	# RETURN: Hash of {"Point" -> Status} 
 	#		where status is the looks_like_number on that timestamp for that point    
 	#	hash also has a kay "activePercenage, which is 0 if req points are missing.
 	#
@@ -1593,7 +1593,7 @@ while (my $inputfile = readdir(DIR))
 			#analytic uses for calculation. Useful for diagnostic output
 		{
 			
-			return \%active;
+			return %active;
 		}
 		my $activePercentageNumerator = 0;
 		my $activePercentageDenominator = (scalar (keys(%active)));
@@ -1603,7 +1603,7 @@ while (my $inputfile = readdir(DIR))
 		}
 
 		$active{"activePercentage"} = $activePercentageNumerator/$activePercentageDenominator;
-		return \%active;
+		return %active;
 	}
 	
 	# sub sandwichSensorFudger
