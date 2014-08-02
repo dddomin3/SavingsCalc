@@ -1506,6 +1506,188 @@ while (my $inputfile = readdir(DIR))
 	
 	##VVAnalytic Equations! They use a lot of the blood brain barrier things, so the should be here.VV
 	
+	# sub activeCheckForDATDev
+	# PURPOSE: Check points needed for DATDev
+	#
+	# INPUTS: 
+	#		PARAMETERS:
+	#			index ($i), $CFM
+	#		GLOBALS:
+	#			$AHUmap, %AHU, %AHUinfo
+	# RETURN: Hash of {"Point" -> Status} 
+	#		where status is the looks_like_number on that timestamp for that point    
+	#	hash also has a kay "activePercenage, which is 0 if req points are missing.
+	#
+	sub activeCheckForDATDev
+	{
+		my $i = $_[0];
+		my $CFM = &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM);
+		my %active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
+			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
+			"SCH" => ( looks_like_number($SCH[$i]) > 0),
+			"SFS" => ( looks_like_number(&FanOn($i)) > 0),
+			"CFM" => ( looks_like_number($CFM) > 0)
+		);
+		foreach my $key (keys %active)
+		{
+			unless ($active{$key})	#if any are false
+			{
+				$active{"activePercentage"} = 0;
+			}
+		}
+		my @fatalPath;
+		foreach my $lists ($AHUmap->getpaths)
+		{
+			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
+			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
+			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
+			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
+			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
+			{
+				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
+				next;	#no point of continuing after this.
+			}
+			my @fatalValve;
+			foreach my $valve (@{$lists})
+			{
+				if($valve =~ m/D/) {next;}
+				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
+				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
+				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
+				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
+				{
+					push @fatalValve, 1;	#if these are all fatal, then path is fatal
+				}
+				else
+				{
+					push @fatalValve, 0;
+				}
+			}
+			my $fatalvFailure = 0;
+			foreach my $fatal (@fatalValve)
+			{
+				$fatalvFailure += $fatal;
+			}
+			if($fatalvFailure == scalar(@fatalValve))	#only if all valve paths were fatal
+			{
+				push @fatalPath, 1;
+			}
+			else
+			{
+				push @fatalPath, 0;
+			}
+		}
+		my $fatalpFailure = 0;
+		foreach my $fatal (@fatalPath)
+		{
+			$fatalpFailure += $fatal;
+		}
+		
+		if($fatalpFailure == scalar(@fatalPath))
+		{
+			$active{"activePercentage"} = 0;
+		}
+		if(exists $active{"activePercentage"})	#since this will only exist if there has been
+			#a previous required point failure, this will return activePercentage = 0
+			#this ensures this hash will always have all the points the
+			#analytic uses for calculation. Useful for diagnostic output
+		{
+			
+			return %active;
+		}
+		my $activePercentageNumerator = 0;
+		my $activePercentageDenominator = (scalar (keys(%active)));
+		foreach my $key (keys(%active))
+		{
+			$activePercentageNumerator += $active{$key};
+		}
+
+		$active{"activePercentage"} = $activePercentageNumerator/$activePercentageDenominator;
+		return %active;
+	}
+	
+	# sub sandwichSensorFudger
+	# PURPOSE: Imagine the following case: (there is no MAD/RAT)
+	#	OAD --- PHV --- CCV
+	#	    MAT		NODE1	SAT
+	# this function will replace AHUmap entries such that CCVtb = MAT and PHVta = SAT.
+	# This should probably only work with DATDev... correct me if i'm wrong.
+	# If this subroutine is used, the &sandwichSensorUnfudger must be called with 
+	# the output of this function passed into it. This function changes AHUmap permanently, 
+	# and these changes must be reverted. Also note that MAT is completely weird to have here,
+	# but stfu.
+	#
+	# INPUTS: 
+	#		GLOBALS:
+	#			$AHUmap
+	# RETURN: Translation hash REFERENCE. $returnRealFakeTranslationHash
+	#		this hash REFERENCE has 4 keys, realtb, realta, faketb, faketa.   
+	#	these keys act as a cypher of sorts to change back to the previous configuration.
+	#	This output MUST be used as an input into sandwichSensorUnfudger to revert changes to AHUmap
+	
+	sub sandwichSensorFudger
+	{
+		my $returnRealFakeTranslationHash = {};
+		foreach my $valve ($AHUmap->getVlv)
+		{
+			if(   (  ( scalar (@{$AHUmap->prevValve($valve)}) ) == 1  )&&($AHUmap->getvtb($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the tb m/NODE/...
+			{
+				my $prevValve = ${$AHUmap->prevValve($valve)}[0];
+				unless (  (( $AHUmap->getvtb($valve) eq $MADta )||( $prevValve eq "OAD" )) || (  ( ($valve =~ m/C/)&&($prevValve =~m/C/) )||( ($valve =~ m/H/)&&($prevValve =~m/H/) )  ) ) 
+				#make sure it doesn't fudge nodes with mix air ducts, or does anything weird with how OAT is treated previously. ALSO that the valves aren't the same type
+				{
+					$returnRealFakeTranslationHash->{"realtb"}->{$valve} = $AHUmap->getvtb($valve);
+					$returnRealFakeTranslationHash->{"faketb"}->{$valve} = $AHUmap->getvtb($prevValve);
+				}
+			}
+			if(   (  ( scalar (@{$AHUmap->nextValve($valve)}) ) == 1  )&&($AHUmap->getvta($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the ta m/NODE/...
+			{
+				my $nextValve = ${$AHUmap->nextValve($valve)}[0];
+				unless ( ( $AHUmap->getvta($valve) eq $MADta ) || (  ( ($valve =~ m/C/)&&($nextValve =~m/C/) )||( ($valve =~ m/H/)&&($nextValve =~m/H/) )  ) ) 
+				#make sure it fudges nodes with mix air ducts. ALSO that the valves aren't the same type
+				{
+					$returnRealFakeTranslationHash->{"realta"}->{$valve} = $AHUmap->getvta($valve);
+					$returnRealFakeTranslationHash->{"faketa"}->{$valve} = $AHUmap->getvta($nextValve);
+				}	
+			}
+		}
+		foreach my $valve (  keys( %{$returnRealFakeTranslationHash->{"faketb"}} )  )	#replaces the ta and tbs with their actual quantities
+		{
+			$AHUmap->setvtb($valve, $returnRealFakeTranslationHash->{"faketb"}->{$valve});
+		}
+		foreach my $valve (  keys( %{ $returnRealFakeTranslationHash->{"faketb"} } )  )
+		{
+			$AHUmap->setvta($valve, $returnRealFakeTranslationHash->{"faketa"}->{$valve});
+		}
+		return $returnRealFakeTranslationHash;
+	}
+	
+	# sub sandwichSensorUnfudger
+	# PURPOSE: Reverts changes done by &sandwichSensorFudger
+	#
+	# INPUTS: 
+	#		PARAMETERS:
+	#			$returnRealFakeTranslationHash
+	#		GLOBALS:
+	#			$AHUmap
+	# RETURN: void
+	#
+	
+	sub sandwichSensorUnfudger
+	{
+		my $inputRealFakeTranslationHash = $_[0];
+		
+		foreach my $valve (keys(%{ $inputRealFakeTranslationHash->{"realtb"} }))	#replaces the ta and tbs with their actual quantities
+		{
+			$AHUmap->setvtb($valve, $inputRealFakeTranslationHash->{"realtb"}->{$valve});
+		}
+		foreach my $valve (keys(%{ $inputRealFakeTranslationHash->{"realta"}}))
+		{
+			$AHUmap->setvta($valve, $inputRealFakeTranslationHash->{"realta"}->{$valve});
+		}
+		return;
+	}
+	
 	sub DATDevH #Dennis Approved, OATta -> MAT changes
 	#DAT Deviation
 	#working
@@ -1563,6 +1745,8 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
+						
+		print Dumper &activeCheckForDATDev($i);
 		my %active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
 			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
 			"SCH" => ( looks_like_number($SCH[$i]) > 0),
@@ -1820,7 +2004,9 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
-		my %active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
+		my %active = &activeCheckForDATDev($i);
+		print Dumper \%active;
+		%active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
 			"MAT" => ( looks_like_number($MAT[$i])) ? 1 : 0,	#MAT
 			"SCH" => ( looks_like_number($SCH[$i])) ? 1 : 0,
 			"SFS" => ( looks_like_number(&FanOn($i))) ? 1 : 0,
