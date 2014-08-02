@@ -1745,8 +1745,6 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
-						
-		print Dumper &activeCheckForDATDev($i);
 		my %active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
 			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
 			"SCH" => ( looks_like_number($SCH[$i]) > 0),
@@ -2004,9 +2002,7 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
-		my %active = &activeCheckForDATDev($i);
-		print Dumper \%active;
-		%active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
+		my %active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
 			"MAT" => ( looks_like_number($MAT[$i])) ? 1 : 0,	#MAT
 			"SCH" => ( looks_like_number($SCH[$i])) ? 1 : 0,
 			"SFS" => ( looks_like_number(&FanOn($i))) ? 1 : 0,
