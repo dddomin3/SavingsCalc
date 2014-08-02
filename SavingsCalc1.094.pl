@@ -26,10 +26,6 @@ my $Kdrybulb = 2.25009*10**(-8);
 
 my $excel = 0;	#flag letting program know it was saved in excel. Excel deletes the comma at the end of a line in a csv file, while i assumed it was here.
 
-
-################################################################################
-################################################################################
-##########711 Joe
 #specifically for outputs (TreeMapData, ReportData)
 ###TreeMapData###
 my %equip =	(
@@ -68,8 +64,6 @@ my %latestAnnul; #Dennis' addition.
 my $Calg; my $Oalg;
 
 my %hashalg; my $algalg; my $AnnSumi = 0;
-################################################################################
-################################################################################
 
 my %stdname;
 my $bobmarley;
@@ -977,6 +971,7 @@ while (my $inputfile = readdir(DIR))
 
 		$laziness =~ s/  \( OK \)//g; #removes all OKs
 		$laziness =~ s/  \( Overridden \)//g; #removes all Overriddens
+		$laziness =~ s/  \( Filler Data \)//g; #removes all Filler Datas
 #		$laziness =~ s/(  \( OK \)|\")//g; #removes all OKs AND QUOTES
 #		$laziness =~ s/\"//g; #removes all quotes
 		while ($laziness =~ s/,,/,NULL,/g){}; #replace empty values with NULL for future treatment
@@ -3325,6 +3320,7 @@ while (my $inputfile = readdir(DIR))
 						$newAnom = "DAT Deviation";
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
 					}
+					#Marked for updating anomaly to be consistant.
 					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
@@ -3495,6 +3491,9 @@ while (my $inputfile = readdir(DIR))
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
 						}
+						print "Gas savings in kWh is ";
+						print ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
+						print "\n";
 						$impday = $annualize{$sitename}{"SimHC"};
 						print "impact days are $impday\n";
 						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"};
@@ -3534,15 +3533,18 @@ while (my $inputfile = readdir(DIR))
 					
 					if(exists ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"})
 					{
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = $ConvElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"};
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = $ConvGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = $ConvSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"};
+					
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec_dollar"} = $DollarElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"};
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas_dollar"} = $DollarGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam_dollar"} = $DollarSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"};
 						
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = $ConvElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = $ConvGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = $ConvSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"};
+						print (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"}, " ");
 						
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"ImpactDays"} = $impday;
+
 						#take each individual wastes
 						
 						#equation is (waste/activedays)*impactdays
@@ -3562,7 +3564,6 @@ while (my $inputfile = readdir(DIR))
 						else 
 						{
 							$bobmarley = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"}/96;
-							
 							my $lilpony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"};
 							my $liltony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"};
 							my $lilrony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
@@ -3583,10 +3584,7 @@ while (my $inputfile = readdir(DIR))
 							if (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} > 1){ ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} = 1; }
 							
 						}
-						################################################################################
-						################################################################################
-						##########711 Joe
-						#############################OUTPUT STUFF#######################################
+
 						#add up this ticket's annualized sum.
 						$AnnSum = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
 						$AnnSumi = $AnnSum;
@@ -3596,15 +3594,15 @@ while (my $inputfile = readdir(DIR))
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSum"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSumb"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnkWh"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"impday"} = $impday;
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeStart"} = $timeStart;
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeEnd"} = $timeEnd;
 						}
 						$AnnkWh += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
-						$Anngas += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
-						$Annsteam += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+						$Anngas += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+						$Annsteam += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
 					
 						#Total W.O.
 						$ticketcount+= 1; #will have total number of tickets
@@ -3647,8 +3645,6 @@ while (my $inputfile = readdir(DIR))
 						}
 						$AnnSumo += $AnnSum;
 						print "${$ticket}{$sitename}{$AHUname}{$ticketLevel} savings is $AnnSum\n";
-						##################################################################################
-						##################################################################################	
 						
 					}
 					else #for tickets with no quantifying savings
@@ -3878,6 +3874,7 @@ while (my $inputfile = readdir(DIR))
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
 						}
+
 						$impday = $annualize{$sitename}{"SimHC"};
 						print "impact days are $impday\n";
 						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"};  
@@ -3913,22 +3910,14 @@ while (my $inputfile = readdir(DIR))
 					}
 					if(exists ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"})
 					{
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = $ConvElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"};
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = $ConvGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"};
+						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = $ConvSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"};
 						
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec_dollar"} = $DollarElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"};
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas_dollar"} = $DollarGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"};
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam_dollar"} = $DollarSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"};
 						
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = $ConvElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = $ConvGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = $ConvSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"};
-						
-						
-						
-						
-						################################################################################
-						################################################################################
-						###############711 Joe
-						################################We need potential annualized as well
 						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"ImpactDays"} = $impday;
 						
 						
@@ -3981,15 +3970,15 @@ while (my $inputfile = readdir(DIR))
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSum"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSumb"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnkWh"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"impday"} = $impday;
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeStart"} = $timeStart;
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeEnd"} = $timeEnd;
 						}
 						$AnnkWh += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
-						$Anngas += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
-						$Annsteam += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+						$Anngas += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
+						$Annsteam += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
 						#Total W.O.
 						$ticketcount += 1; #will have total number of tickets
 						#Algorithm
@@ -4065,169 +4054,10 @@ while (my $inputfile = readdir(DIR))
 				print "Ticket is after dataend. Bad.\n\t TI:$ticketIndex\n\tTicket:$timeEnd\n\tData:${$AHU{TT}}[-1]\n\n";
 				next;
 			}
-		}
-		
-
-		
-		
-		########################Two separate files for ReportData.csv#############################
-		# my $bigbird = $ronald->format_cldr("yyyy'-'MM");	#starttime
-		# my $grouch;
-		# if($grimace ne "NULL")
-		# {
-			# $grouch = $grimace->format_cldr("yyyy'-'MM");	#endtime
-		# }
-		# else
-		# {
-			# $grouch = "NULL";
-		# }
-		# #search tickets for start/close time, find whether ticket was closed in month or not. If closed +1 for "completed", for open +1 for outstanding (if start-time month not equal to setclose month)
-		# #momonths only the previous 12 months, so sites older than 1 year will not create a hash with more than 12 month-keys
-		# #WORKS
-		# for (my $yes = 0; $yes<=11; $yes++)
-		# {
-			# my $jdate;
-			# if ($momonths[$yes]<=9)
-			# {
-				# $jdate = "$yearss[$yes]-0$momonths[$yes]"; #Jan-Sep! YAY FALL!
-			# }
-			# elsif ($momonths[$yes]>=10)
-			# {
-				# $jdate = "$yearss[$yes]-$momonths[$yes]"; #because oct/nov/dec being all double digits and stuff. WHO DO THEY THINK THEY ARE?
-			# }
-			# if ($grouch =~ /$jdate/) #completed this month
-			# {
-				# if( exists ($mhash{$momonths[$yes]}) )
-				# {
-					# $mhash{$momonths[$yes]}{"Completed"} += 1;
-				# }
-				# else
-				# {
-					# $mhash{$momonths[$yes]}{"Completed"} = 1;
-					# $mhash{$momonths[$yes]}{"Outstanding"} = 0;
-				# }
-				# if($AnnSum)	#if AnnSum is defined
-				# {
-					# #increment for each completed ticket this month per asset
-					# $ahuhash{$AHUname}{"Completed"} += $AnnSumi;
-					# #increment for each completed ticket this month per algorithm
-					# $alg{$newAnom}{"Completed"} += $AnnSumi;
-				# }
-			# }
-			# if ($bigbird =~ /$jdate/ && $grouch !~ /$jdate/) #open this month and not closed this month, outstanding
-			# {
-				# if( exists ($mhash{$momonths[$yes]}) )
-				# {
-					# $mhash{$momonths[$yes]}{"Outstanding"} += 1;
-				# }
-				# else
-				# {
-					# $mhash{$momonths[$yes]}{"Completed"} = 0;
-					# $mhash{$momonths[$yes]}{"Outstanding"} = 1;
-				# }
-				# #increment for each outstanding ticket this month per asset
-				# $ahuhash{$AHUname}{"Outstanding"} += $AnnSumi;
-				# #increment for each outstanding ticket this month per algorithm
-				# $alg{$newAnom}{"Outstanding"} += $AnnSumi;
-			# }
-		# }
-		# #print Dumper \%mhash;
-		# ####Month Sort
-		# #Does not work, JOE
-		# #for current month
-		# if (($bigbird =~ /$cdate/ && $grouch =~ /$cdate/) && $tstat eq "Closed") #Current month completed
-		# {
-			# $cmc += 1; #keep track of number of tickets
-			# $cmcsave += $AnnSumi; #accumulate values
-			# $lifec += 1; #lifetime tickets completed
-			# $lifecsave += $AnnSumi; #accumulate values of all completed tickets
-		# }
-		# if (($bigbird =~ /$cdate/ && ($grouch !~ /$cdate/ || $grouch eq "NULL")) && $tstat eq "Open") #current month, still open
-		# {
-			# $cmo += 1;
-			# $cmosave += $AnnSumi;
-			# $lifeo += 1;
-			# $lifeosave += $AnnSumi;
-		# }
-		# #for carryovers
-		# if ($bigbird !~ /$cdate/ && $grouch =~ /$cdate/ && $tstat eq "Closed") #Carryover, closed current month
-		# {
-			# $pmc += 1;
-			# $pmcsave += $AnnSumi;
-			# $lifec += 1;
-			# $lifecsave += $AnnSumi;
-		# }
-		# if (($bigbird !~ /$cdate/ && ($grouch !~ /$cdate/ || $grouch eq "NULL")) && $tstat eq "Open") #Carryover, still open current month
-		# {
-			# $pmo += 1;
-			# $pmosave += $AnnSumi;
-			# $lifeo += 1;
-			# $lifeosave += $AnnSumi;
-		# }
-		# #for remaining lifetime (if not opened or closed during the report month)
-		# if ($bigbird !~ /$cdate/ && $grouch !~ /$cdate/ && $tstat eq "Closed")#open and closed during other months
-		# {
-			# $lifec += 1;
-			# $lifecsave += $AnnSumi; 
-		# }
-		##########################################################################################
-		#${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"EndTime"} = $grimace->format_cldr( "MM'/'dd'/'yyyy HH':'mm" );
-		#${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"StartTime"} = $ronald->format_cldr( "MM'/'dd'/'yyyy HH':'mm" );	
-	
+			print $AnnSum;
+		}	
 	}
 	
-	# $AnnSumo = 0;
-	# $AnnkWh = 0;
-	# $Anngas = 0;
-	# $Annsteam = 0;
-	# #################DENNIS 666
-	# foreach my $AHUnamean (keys %latestAnnul)
-	# {
-		# foreach my $annaMolly (keys %{$latestAnnul{$AHUnamean}})
-		# {
-			# my $prevDeath = "NULL";
-			# foreach my $TickID (sort { $latestAnnul{$AHUnamean}{$annaMolly}{$b}{"TicketAge"} <=> $latestAnnul{$AHUnamean}{$annaMolly}{$a}{"TicketAge"} } keys %{$latestAnnul{$AHUnamean}{$annaMolly}})
-			# {
-				# my $currDeath = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"TicketAge"} - $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"impday"};
-				# if((looks_like_number($prevDeath))&&(($prevDeath - $currDeath )> $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"impday"})) { $prevDeath = "NULL"; }
-				# print "$TickID\t".$latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"TicketAge"}."\n";
-				# if($prevDeath eq "NULL")
-				# {
-					# $AnnSumo += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"AnnSum"};	#prioritizes oldest ticket in annuls
-					# $AnnkWh += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"AnnkWh"};
-					# $Anngas += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"Anngas"};
-					# $Annsteam += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"Annsteam"};
-					# $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"} = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"AnnSum"};
-					# $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"truegas"} = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"Anngas"};
-					# $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"truekWh"} = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"AnnkWh"};
-					# $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"truesteam"} = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"Annsteam"};
-				# }
-				# elsif($prevDeath < 0) {last;} #If it dies after the month, these tickets won't apply
-				# else
-				# {
-					# my $annulFraction = ($currDeath - $prevDeath)/($currDeath - $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"TicketAge"});	#this is the fraction in which this ticket applies to annualization
-					# $AnnSumo += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"AnnSum"}*$annulFraction;
-					# $AnnkWh += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"AnnkWh"}*$annulFraction;
-					# $Anngas += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"Anngas"}*$annulFraction;
-					# $Annsteam += $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"Annsteam"}*$annulFraction;
-					# $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"trueAnnul"} = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"AnnSum"}*$annulFraction;
-					# $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"truegas"} = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"Anngas"}*$annulFraction;
-					# $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"truesteam"} = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"Annsteam"}*$annulFraction;
-					# $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"truekWh"} = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"AnnkWh"}*$annulFraction;
-				# }
-				# $prevDeath = $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"TicketAge"} - $latestAnnul{$AHUnamean}{$annaMolly}{$TickID}{"impday"};
-			# }
-			
-		# }
-	# }
-	#####################################################################################
-	########################in case the site is younger than 1 year######################
-	#%mhash -> tickets by month hash
-
-	
-	
-	###############################################################
-	###############################################################
 	#####################print everything out for ReportData.csv###
 	open (my $RepDat1, '>', 'ReportData_save.csv');
 	
@@ -4380,9 +4210,7 @@ while (my $inputfile = readdir(DIR))
 	{
 	}
 	print Dumper \%mhash;
-	
-	##########################################################################################
-	##########################################################################################
+
 	#######################printing TreeMapData outputs into .csv#########################################
 	#WORKS
 	open (my $TreeEquip, '>', 'TreeEquip.csv');
