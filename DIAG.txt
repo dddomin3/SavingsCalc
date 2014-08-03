@@ -1,54 +1,11 @@
-HAUN	AHU1	SimHC_Tempdb	Missing Value. Set to default. 2
-HAUN	AHU1	Econ_Enthdb	Missing Value. Set to default. 1
-HAUN	AHU1	ConvGas	Missing Value. Set to default. 1
-HAUN	AHU1	ConvSteam	Missing Value. Set to default. 1
-HAUN	AHU1	DollarGas	Missing Value. Set to default. 1
-HAUN	AHU1	DollarSteam	Missing Value. Set to default. 1
-HAUN	AHU2	SimHC_Tempdb	Missing Value. Set to default. 2
-HAUN	AHU2	Econ_Enthdb	Missing Value. Set to default. 1
-HAUN	AHU2	ConvGas	Missing Value. Set to default. 1
-HAUN	AHU2	ConvSteam	Missing Value. Set to default. 1
-HAUN	AHU2	DollarGas	Missing Value. Set to default. 1
-HAUN	AHU2	DollarSteam	Missing Value. Set to default. 1
-HAUN	AHU3	Econ_Dampdb	Missing Value. Set to default. 5
-HAUN	AHU3	SimHC_Tempdb	Missing Value. Set to default. 2
-HAUN	AHU3	Econ_Tempdb	Missing Value. Set to default. 2
-HAUN	AHU3	Econ_Enthdb	Missing Value. Set to default. 1
-HAUN	AHU3	Econ_EnthSP	Missing Value. Set to default. 0
-HAUN	AHU3	Econ_ClimateSP	Missing Value. Set to default. 69
-HAUN	AHU3	ConvGas	Missing Value. Set to default. 1
-HAUN	AHU3	ConvSteam	Missing Value. Set to default. 1
-HAUN	AHU3	DollarGas	Missing Value. Set to default. 1
-HAUN	AHU3	DollarSteam	Missing Value. Set to default. 1
-HAUN	AHU4	SimHC_Tempdb	Missing Value. Set to default. 2
-HAUN	AHU4	Econ_Enthdb	Missing Value. Set to default. 1
-HAUN	AHU4	ConvGas	Missing Value. Set to default. 1
-HAUN	AHU4	ConvSteam	Missing Value. Set to default. 1
-HAUN	AHU4	DollarGas	Missing Value. Set to default. 1
-HAUN	AHU4	DollarSteam	Missing Value. Set to default. 1
-HAUN	AHU5	SimHC_Tempdb	Missing Value. Set to default. 2
-HAUN	AHU5	Econ_Enthdb	Missing Value. Set to default. 1
-HAUN	AHU5	ConvGas	Missing Value. Set to default. 1
-HAUN	AHU5	ConvSteam	Missing Value. Set to default. 1
-HAUN	AHU5	DollarGas	Missing Value. Set to default. 1
-HAUN	AHU5	DollarSteam	Missing Value. Set to default. 1
-HAUN	AHU6	SimHC_Tempdb	Missing Value. Set to default. 2
-HAUN	AHU6	Econ_Enthdb	Missing Value. Set to default. 1
-HAUN	AHU6	ConvGas	Missing Value. Set to default. 1
-HAUN	AHU6	ConvSteam	Missing Value. Set to default. 1
-HAUN	AHU6	DollarGas	Missing Value. Set to default. 1
-HAUN	AHU6	DollarSteam	Missing Value. Set to default. 1
-No, or misnamed global.csv!Using AHUname: AHU1 for Filename: AHU1.csv
+Using AHUname: AHU1 for Filename: AHU1.csv
 	NO DATA	OCC
 	NO DATA	RAD
 	NO DATA	EAD
 	NO DATA	MAD
 	NO DATA	PHT
 	NO DATA	RAE
-	NO DATA	OAT
 	NO DATA	OAE
-	NO DATA	OAH
-	NO DATA	OAT
 Using AHUname: AHU4 for Filename: AHU4.csv
 	NO DATA	OCC
 	NO DATA	RAD
@@ -56,7 +13,11 @@ Using AHUname: AHU4 for Filename: AHU4.csv
 	NO DATA	MAD
 	NO DATA	PHT
 	NO DATA	RAE
-	NO DATA	OAT
 	NO DATA	OAE
-	NO DATA	OAH
-	NO DATA	OAT
+Using AHUname: AHU5 for Filename: AHU5.csv
+	NO DATA	OCC
+	NO DATA	RAD
+	NO DATA	EAD
+	NO DATA	MAD
+	NO DATA	RAE
+	NO DATA	OAE

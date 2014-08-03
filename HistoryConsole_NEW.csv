@@ -1,23 +1,40 @@
 Event ID,Facility,Asset,Created Time,SetClosedTime,Anomaly,Status,Cause,Effect,Source,ReturnStatus,Comments,
-MCD-0116956,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,"We found the AHU to be hunting, I changed out a bad damper actuator, we also adjusted the AHU fan % offset "
-MCD-0116955,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116954,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,The AHU cooling valve was set to 50% needed to be in auto operation.
-MCD-0116953,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Damper,Closed,NULL,NULL,Analytic,Good Feedback,"Checked outside air dampers and return dampers and are functioning properly at this time, have watched over last couple days. The min.air dampers are open 100% when the outside dampers are closed in this part of the AHU. Will continue to watch damper operation."
-MCD-0116952,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Above Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,"We found the AHU to be hunting, I changed out a bad damper actuator, we also adjusted the AHU fan % offset "
-MCD-0116951,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Heating Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116950,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Improper Economizing,Closed,NULL,NULL,Analytic,Good Feedback,The AHU cooling valve was set to 50% needed to be in auto operation.
-MCD-0116949,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Overage Running Hours,Closed,NULL,NULL,Analytic,Good Feedback,"Checked outside air dampers and return dampers and are functioning properly at this time, have watched over last couple days. The min.air dampers are open 100% when the outside dampers are closed in this part of the AHU. Will continue to watch damper operation."
-MCD-0116948,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,"We found the AHU to be hunting, I changed out a bad damper actuator, we also adjusted the AHU fan % offset "
-MCD-0116947,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116946,Hamburger University,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,The AHU cooling valve was set to 50% needed to be in auto operation.
-MCD-0116945,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,"We found the AHU to be hunting, I changed out a bad damper actuator, we also adjusted the AHU fan % offset "
-MCD-0116944,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116943,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,The AHU cooling valve was set to 50% needed to be in auto operation.
-MCD-0116942,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Damper,Closed,NULL,NULL,Analytic,Good Feedback,"Checked outside air dampers and return dampers and are functioning properly at this time, have watched over last couple days. The min.air dampers are open 100% when the outside dampers are closed in this part of the AHU. Will continue to watch damper operation."
-MCD-0116941,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Above Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,"We found the AHU to be hunting, I changed out a bad damper actuator, we also adjusted the AHU fan % offset "
-MCD-0116940,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Heating Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116939,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Improper Economizing,Closed,NULL,NULL,Analytic,Good Feedback,The AHU cooling valve was set to 50% needed to be in auto operation.
-MCD-0116938,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Overage Running Hours,Closed,NULL,NULL,Analytic,Good Feedback,"Checked outside air dampers and return dampers and are functioning properly at this time, have watched over last couple days. The min.air dampers are open 100% when the outside dampers are closed in this part of the AHU. Will continue to watch damper operation."
-MCD-0116937,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,"We found the AHU to be hunting, I changed out a bad damper actuator, we also adjusted the AHU fan % offset "
-MCD-0116936,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116935,Hamburger University,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,The AHU cooling valve was set to 50% needed to be in auto operation.
+MCD-0116956,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116955,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116954,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116953,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116952,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Above Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116951,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Heating Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116950,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Improper Economizing,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116949,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Overage Running Hours,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116948,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116947,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116946,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116945,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,DSP Above Set Point,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116944,FAKE,AHU1,2014-02-28T22:28:11,2014-05-16T10:25:19,Simultaneous Heating and Cooling,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116943,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116942,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116941,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116940,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116939,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Above Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116938,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Heating Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116937,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Improper Economizing,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116936,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Overage Running Hours,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116935,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116934,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116933,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116932,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,DSP Above Set Point,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116931,FAKE,AHU4,2014-02-28T22:28:11,2014-05-16T10:25:19,Simultaneous Heating and Cooling,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116930,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116929,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116928,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116927,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116926,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Above Set Point - Cooling Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116925,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,DAT Below Set Point - Heating Control Logic Failure,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116924,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Improper Economizing,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116923,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Overage Running Hours,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116922,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Leaky Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116921,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Valve,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116920,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Stuck Damper,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116919,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,DSP Above Set Point,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
+MCD-0116918,FAKE,AHU5,2014-02-28T22:28:11,2014-05-16T10:25:19,Simultaneous Heating and Cooling,Closed,NULL,NULL,Analytic,Good Feedback,Honeywell found a bad 
