@@ -1830,6 +1830,7 @@ while (my $inputfile = readdir(DIR))
 				}
 			}
 		}
+		
 		return %savings;
 	}
 	
@@ -1982,44 +1983,7 @@ while (my $inputfile = readdir(DIR))
 		my $i = $_[0];
 		my $CFM = $_[1];
 		my $VFD = $_[2];
-		my %realtb;
-		my %realta;
-		my %faketb;
-		my %faketa;
 		
-		#{ This is the code that deals with missing timestamps between two valves
-		foreach my $valve ($AHUmap->getVlv)
-		{
-			if(   (  ( scalar (@{$AHUmap->prevValve($valve)}) ) == 1  )&&($AHUmap->getvtb($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the tb m/NODE/...
-			{
-				my $prevValve = ${$AHUmap->prevValve($valve)}[0];
-				unless (  (( $AHUmap->getvtb($valve) eq $MADta )||( $prevValve eq "OAD" )) || (  ( ($valve =~ m/C/)&&($prevValve =~m/C/) )||( ($valve =~ m/H/)&&($prevValve =~m/H/) )  ) ) 
-				#make sure it doesn't fudge nodes with mix air ducts, or does anything weird with how OAT is treated previously. ALSO that the valves aren't the same type
-				{
-					$realtb{$valve} = $AHUmap->getvtb($valve);
-					$faketb{$valve} = $AHUmap->getvtb($prevValve);
-				}
-			}
-			if(   (  ( scalar (@{$AHUmap->nextValve($valve)}) ) == 1  )&&($AHUmap->getvta($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the ta m/NODE/...
-			{
-				my $nextValve = ${$AHUmap->nextValve($valve)}[0];
-				unless ( ( $AHUmap->getvta($valve) eq $MADta ) || (  ( ($valve =~ m/C/)&&($nextValve =~m/C/) )||( ($valve =~ m/H/)&&($nextValve =~m/H/) )  ) ) 
-				#make sure it fudges nodes with mix air ducts. ALSO that the valves aren't the same type
-				{
-					$realta{$valve} = $AHUmap->getvta($valve);
-					$faketa{$valve} = $AHUmap->getvta($nextValve);
-				}	
-			}
-		}
-		foreach my $valve (keys(%faketb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $faketb{$valve});
-		}
-		foreach my $valve (keys(%faketa))
-		{
-			$AHUmap->setvta($valve, $faketa{$valve});
-		}
-		#}
 		my %savings =	(	
 							'elec' => 0,
 							'gas' => 0,
@@ -2107,14 +2071,7 @@ while (my $inputfile = readdir(DIR))
 				}
 			}
 		}
-		foreach my $valve (keys(%realtb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $realtb{$valve});
-		}
-		foreach my $valve (keys(%realta))
-		{
-			$AHUmap->setvta($valve, $realta{$valve});
-		}
+		
 		print $ooo ",".$savings{"elec"}.",".$savings{"active"}."\n";
 		return %savings;
 	}
@@ -2139,40 +2096,7 @@ while (my $inputfile = readdir(DIR))
 		my %faketb;
 		my %faketa;
 		
-		#{ This is the code that deals with missing timestamps between two valves
-		foreach my $valve ($AHUmap->getVlv)
-		{
-			if(   (  ( scalar (@{$AHUmap->prevValve($valve)}) ) == 1  )&&($AHUmap->getvtb($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the tb m/NODE/...
-			{
-				my $prevValve = ${$AHUmap->prevValve($valve)}[0];
-				unless (  (( $AHUmap->getvtb($valve) eq $MADta )||( $prevValve eq "OAD" )) || (  ( ($valve =~ m/C/)&&($prevValve =~m/C/) )||( ($valve =~ m/H/)&&($prevValve =~m/H/) )  ) ) 
-				#make sure it doesn't fudge nodes with mix air ducts, or does anything weird with how OAT is treated previously. ALSO that the valves aren't the same type
-				{
-					$realtb{$valve} = $AHUmap->getvtb($valve);
-					$faketb{$valve} = $AHUmap->getvtb($prevValve);
-				}
-			}
-			if(   (  ( scalar (@{$AHUmap->nextValve($valve)}) ) == 1  )&&($AHUmap->getvta($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the ta m/NODE/...
-			{
-				my $nextValve = ${$AHUmap->nextValve($valve)}[0];
-				unless ( ( $AHUmap->getvta($valve) eq $MADta ) || (  ( ($valve =~ m/C/)&&($nextValve =~m/C/) )||( ($valve =~ m/H/)&&($nextValve =~m/H/) )  ) ) 
-				#make sure it fudges nodes with mix air ducts. ALSO that the valves aren't the same type
-				{
-					$realta{$valve} = $AHUmap->getvta($valve);
-					$faketa{$valve} = $AHUmap->getvta($nextValve);
-				}	
-			}
-		}
-		foreach my $valve (keys(%faketb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $faketb{$valve});
-		}
-		foreach my $valve (keys(%faketa))
-		{
-			$AHUmap->setvta($valve, $faketa{$valve});
-		}
-		#}
-
+		
 		my %active = (
 			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
 			"SCH" => ( looks_like_number($SCH[$i]) > 0),
@@ -2392,14 +2316,7 @@ while (my $inputfile = readdir(DIR))
 			#aaaaaaw meh bucktz are empty :_(
 			
 		}
-		foreach my $valve (keys(%realtb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $realtb{$valve});
-		}
-		foreach my $valve (keys(%realta))
-		{
-			$AHUmap->setvta($valve, $realta{$valve});
-		}
+		
 		return %savings;
 	}
 
@@ -2423,39 +2340,7 @@ while (my $inputfile = readdir(DIR))
 		my %realta;
 		my %faketb;
 		my %faketa;
-		#{ This is the code that deals with missing timestamps between two valves
-		foreach my $valve ($AHUmap->getVlv)
-		{
-			if(   (  ( scalar (@{$AHUmap->prevValve($valve)}) ) == 1  )&&($AHUmap->getvtb($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the tb m/NODE/...
-			{
-				my $prevValve = ${$AHUmap->prevValve($valve)}[0];
-				unless (  (( $AHUmap->getvtb($valve) eq $MADta )||( $prevValve eq "OAD" )) || (  ( ($valve =~ m/C/)&&($prevValve =~m/C/) )||( ($valve =~ m/H/)&&($prevValve =~m/H/) )  ) ) 
-				#make sure it doesn't fudge nodes with mix air ducts, or does anything weird with how OAT is treated previously. ALSO that the valves aren't the same type
-				{
-					$realtb{$valve} = $AHUmap->getvtb($valve);
-					$faketb{$valve} = $AHUmap->getvtb($prevValve);
-				}
-			}
-			if(   (  ( scalar (@{$AHUmap->nextValve($valve)}) ) == 1  )&&($AHUmap->getvta($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the ta m/NODE/...
-			{
-				my $nextValve = ${$AHUmap->nextValve($valve)}[0];
-				unless ( ( $AHUmap->getvta($valve) eq $MADta ) || (  ( ($valve =~ m/C/)&&($nextValve =~m/C/) )||( ($valve =~ m/H/)&&($nextValve =~m/H/) )  ) ) 
-				#make sure it fudges nodes with mix air ducts. ALSO that the valves aren't the same type
-				{
-					$realta{$valve} = $AHUmap->getvta($valve);
-					$faketa{$valve} = $AHUmap->getvta($nextValve);
-				}	
-			}
-		}
-		foreach my $valve (keys(%faketb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $faketb{$valve});
-		}
-		foreach my $valve (keys(%faketa))
-		{
-			$AHUmap->setvta($valve, $faketa{$valve});
-		}
-		#}	
+	
 		my %active = (
 			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
 			"SCH" => ( looks_like_number($SCH[$i]) > 0),
@@ -2676,14 +2561,7 @@ while (my $inputfile = readdir(DIR))
 			#aaaaaaw meh bucktz are empty :_(
 			
 		}
-		foreach my $valve (keys(%realtb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $realtb{$valve});
-		}
-		foreach my $valve (keys(%realta))
-		{
-			$AHUmap->setvta($valve, $realta{$valve});
-		}
+		
 		return %savings;
 	}
 
@@ -3172,12 +3050,12 @@ while (my $inputfile = readdir(DIR))
 	foreach my $ticketLevel (keys %{${$ticket}{$sitename}{$AHUname}})	#this gets each ticket from the current $AHUname
 	{
 		$ticketsum += 1; #work order counter.
-		#unless ( (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Return Status"} eq "Good Feedback") || (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Return Status"} eq "Bad Feedback Valid") ) { next; } 	#makes sure return status is gucci
+		#unless ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Return Status"} eq "Good Feedback") || ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Return Status"} eq "Bad Feedback Valid") ) { next; } 	#makes sure return status is gucci
 		
-		my $timeStart = &Timeround(${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"StartTime"});
+		my $timeStart = &Timeround($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"StartTime"});
 		my $timeEnd;
-		if (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"EndTime"} =~ m/NULL/) {$timeEnd = "NULL"}
-		else {$timeEnd = &Timeround(${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"EndTime"});}
+		if ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"EndTime"} =~ m/NULL/) {$timeEnd = "NULL"}
+		else {$timeEnd = &Timeround($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"EndTime"});}
 		print "------------------------\n";
 		#print "\t\tTicketStart $timeStart\n\tTicketEnd $timeEnd\n\t\tData Start ${$AHU{TT}}[0]\n\tData End ${$AHU{TT}}[-1]";
 		my $ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
@@ -3189,9 +3067,9 @@ while (my $inputfile = readdir(DIR))
 		my $AnnSum = 0;
 		my $impday = 0;
 		my $AnnSumi = 0;
-		my $grimace = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"EndTime"}; #put endtime into a string for easy reading at the end
-		my $ronald = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"StartTime"}; #put starttime into a string for easy reading at the end
-		my $tstat = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Status"};
+		my $grimace = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"EndTime"}; #put endtime into a string for easy reading at the end
+		my $ronald = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"StartTime"}; #put starttime into a string for easy reading at the end
+		my $tstat = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Status"};
 		
 		##########################################################################################
 			
@@ -3220,12 +3098,12 @@ while (my $inputfile = readdir(DIR))
 		}
 		
 		
-		${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"} = $bobmarley + 1;
-		${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"TicketAge"} = &timeIndex(${$AHU{"TT"}}[-1], $timeStart)*(15/1440);
+		$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
+		$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"TicketAge"} = &timeIndex(${$AHU{"TT"}}[-1], $timeStart)*(15/1440);
 		
-		my $anom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"}; #anomaly
-		my $cause = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Cause"}; #cause
-		my $effect = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Effect"}; #effect
+		my $anom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}; #anomaly
+		my $cause = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"}; #cause
+		my $effect = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"}; #effect
 				
 		if ( $ticketIndex < 0 ) #ticket start time is before Data start time. Cannot Calculate. Report to DIAG
 		{
@@ -3238,19 +3116,19 @@ while (my $inputfile = readdir(DIR))
 			if( $ticketIndex < scalar (@{$AHU{"TT"}}) )	#ticket start time before data end time. good.
 			{
 				print "Start time of ticket before endtime of data. Good.\n"; 
-				if ((${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"EndTime"} ne "NULL")&&( (timeIndex($timeEnd,${$AHU{"TT"}}[-1]) <= 0 ) ))  #if end time exists ANd it's within Databounds
+				if (($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"EndTime"} ne "NULL")&&( (timeIndex($timeEnd,${$AHU{"TT"}}[-1]) <= 0 ) ))  #if end time exists ANd it's within Databounds
 				{
 					print "endtoend:".timeIndex($timeEnd,${$AHU{"TT"}}[-1])."\n";
 					print "Ticket End time before data end. Forreal.\n";
-					if (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Below Set Point - Cooling/) 
+					if (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Below Set Point - Cooling/) 
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/) 
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Cooling event
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						#print "|";
 						print "fudge\n";
 						my $translationHashRef = &sandwichSensorFudger();
@@ -3261,301 +3139,311 @@ while (my $inputfile = readdir(DIR))
 							my %active = activeCheckForDATDev($i);
 							unless ( $active{"activePercentage"} ) {next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						
 						$impday = $annualize{$sitename}{"DATDevC"};
 						print "impact days are $impday\n";
 						$newAnom = "DAT Deviation";
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					#Marked for updating anomaly to be consistant.
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DAT Deviation";
 						$anom = $newAnom;
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Above Set Point - Cooling/)
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Above Set Point - Cooling/)
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Greater/ ) )  ) #if it is DATDEV Cooling event, above set point. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DAT Deviation";
 						$anom = $newAnom;
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DSP Below Set Point/)
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Below Set Point/)
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Less/ ) )  ) #if it is DSPDev Below event. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DSP Deviation";
 						$anom = $newAnom;
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					
 					
 					
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Above Set Point - Heating/)
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Above Set Point - Heating/)
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Heating event
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+						
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						#print "|";
+						
+						my $translationHashRef = &sandwichSensorFudger();
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
+							my %active = activeCheckForDATDev($i);
+							unless ( $active{"activePercentage"} ) {next;}
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};		
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};		
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
-						 $impday = $annualize{$sitename}{"DATDevH"};
+						&sandwichSensorUnfudger($translationHashRef);
+						$impday = $annualize{$sitename}{"DATDevH"};
 						print "impact days are $impday\n";
 						$newAnom = "DAT Deviation";
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Overage Running Hours/)
-					|| (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Overage Running Hours/)
+					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
 						print $ooo $AHUname."\n";
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						my $translationHashRef = &sandwichSensorFudger();
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
+						
 						$impday = $annualize{$sitename}{"OutofOcc"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"};
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"};
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Leaky Damper/) ) #if it is Overage Running Hours or Out of Occupancy
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Leaky Damper/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal
-							
-							###Weekly Treatment Code###
-							$timeStart->subtract(days => 7);
-							$timeStart = Timeround($timeStart);
-							$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
-							$bobmarley = timeIndex($timeEnd, $timeStart);
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"} = $bobmarley + 1;
-							###Weekly Treatment Code###
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal
+						my $translationHashRef = &sandwichSensorFudger();
+						
+						###Weekly Treatment Code###
+						$timeStart->subtract(days => 7);
+						$timeStart = Timeround($timeStart);
+						$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
+						$bobmarley = timeIndex($timeEnd, $timeStart);
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
+						###Weekly Treatment Code###
+						
 						#print "|";
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &LeakyDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"LeakyDamp"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"};
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"};
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Stuck Damper/) ) #if it is Overage Running Hours or Out of Occupancy
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Stuck Damper/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
-							
-							###Weekly Treatment Code###
-							$timeStart->subtract(days => 7);
-							$timeStart = Timeround($timeStart);
-							$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
-							$bobmarley = timeIndex($timeEnd, $timeStart);
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"} = $bobmarley + 1;
-							###Weekly Treatment Code###
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						my $translationHashRef = &sandwichSensorFudger();
+						###Weekly Treatment Code###
+						$timeStart->subtract(days => 7);
+						$timeStart = Timeround($timeStart);
+						$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
+						$bobmarley = timeIndex($timeEnd, $timeStart);
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
+						###Weekly Treatment Code###
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &StuckDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
+						
 						$impday = $annualize{$sitename}{"StuckDamp"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"};
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"};
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/) 
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
-							print $dbg "VDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSP\nV";
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						print $dbg "VDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSPDSP\nV";
+
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print $AHU{"TT"}[$i]."|";
+
 							my %datsave = &DSPDev($i, &REALLYMakeVFD($i, $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
 						$impday = $annualize{$sitename}{"DSPDev"};
 						print "impact days are $impday\n";
 						$newAnom = "DSP Deviation";
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Simultaneous Heat/) ) #
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Simultaneous Heat/) ) #
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &SimHC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
 						print "Gas savings in kWh is ";
-						print ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
+						print $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"};
 						print "\n";
 						$impday = $annualize{$sitename}{"SimHC"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"};
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"};
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Leaky Valve/) ) #
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Leaky Valve/) ) #
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = 0;		#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
-							
-							###Weekly Treatment Code###
-							$timeStart->subtract(days => 7);
-							$timeStart = Timeround($timeStart);
-							$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
-							$bobmarley = timeIndex($timeEnd, $timeStart);
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"} = $bobmarley + 1;
-							###Weekly Treatment Code###
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						###Weekly Treatment Code###
+						$timeStart->subtract(days => 7);
+						$timeStart = Timeround($timeStart);
+						$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
+						$bobmarley = timeIndex($timeEnd, $timeStart);
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
+						###Weekly Treatment Code###
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print "made it to the forloop! \n";
-
-							#print &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM); print "\n";
-							# print $AHU{"TT"}[$i]."|"; print "\n";
 							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
 						$impday = $annualize{$sitename}{"LeakyVlv"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"};
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"};
 					}
 					
-					if(exists ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"})
+					if(exists $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"})
 					{
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} = $ConvElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} = $ConvGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = $ConvSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = $ConvElec*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = $ConvGas*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = $ConvSteam*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"};
 					
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec_dollar"} = $DollarElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas_dollar"} = $DollarGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam_dollar"} = $DollarSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec_dollar"} = $DollarElec*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas_dollar"} = $DollarGas*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam_dollar"} = $DollarSteam*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"};
 						
-						print (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"}, " ");
+						print ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"}, " ");
 						
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"ImpactDays"} = $impday;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"ImpactDays"} = $impday;
 
 						#take each individual wastes
 						
 						#equation is (waste/activedays)*impactdays
 						#put annualized savings into the hashes
-						if (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} == 0) #no active time stamps.
+						if ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} == 0) #no active time stamps.
 						{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"} = 0; #elec annualized savings
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"} = 0; #steam
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"} = 0; #gas
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings"} = 0; #elec annualized savings
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings"} = 0; #steam
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings"} = 0; #gas
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"} = 0; #elec annualized savings
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"} = 0; #steam
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"} = 0; #gas
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"} = 0; #elec annualized savings
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"} = 0; #steam
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"} = 0; #gas
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} = 0;
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Data Reliability"} = 0;
 						}
 						else 
 						{
-							$bobmarley = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"}/96;
-							my $lilpony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"};
-							my $liltony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"};
-							my $lilrony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"};
+							$bobmarley = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"}/96;
+							my $lilpony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"};
+							my $liltony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"};
+							my $lilrony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"};
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"} = ($lilpony/$bobmarley)*$impday; #elec annualized savings
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"} = ($liltony/$bobmarley)*$impday; #steam
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"} = ($lilrony/$bobmarley)*$impday; #gas
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings"} = ($lilpony/$bobmarley)*$impday; #elec annualized savings
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings"} = ($liltony/$bobmarley)*$impday; #steam
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings"} = ($lilrony/$bobmarley)*$impday; #gas
 							
-							$lilpony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec_dollar"};
-							$liltony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam_dollar"};
-							$lilrony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas_dollar"};
+							$lilpony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec_dollar"};
+							$liltony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam_dollar"};
+							$lilrony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas_dollar"};
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"} = ($lilpony/$bobmarley)*$impday; #elec annualized savings
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"} = ($liltony/$bobmarley)*$impday; #steam
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"} = ($lilrony/$bobmarley)*$impday; #gas
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"} = ($lilpony/$bobmarley)*$impday; #elec annualized savings
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"} = ($liltony/$bobmarley)*$impday; #steam
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"} = ($lilrony/$bobmarley)*$impday; #gas
 
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"}/${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"};
-							if (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} > 1){ ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} = 1; }
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Data Reliability"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"}/$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"};
+							if ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Data Reliability"} > 1){ $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Data Reliability"} = 1; }
 							
 						}
 
 						#add up this ticket's annualized sum.
-						$AnnSum = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
+						$AnnSum = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"};
 						$AnnSumi = $AnnSum;
 						if($AnnSum > 0)	#if the ticket is non-zero
 						{
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"TicketAge"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"TicketAge"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSum"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSumb"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnkWh"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"TicketAge"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"TicketAge"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSum"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSumb"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnkWh"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings"};
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"impday"} = $impday;
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeStart"} = $timeStart;
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeEnd"} = $timeEnd;
 						}
-						$AnnkWh += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
-						$Anngas += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
-						$Annsteam += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
+						$AnnkWh += $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings"};
+						$Anngas += $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings"};
+						$Annsteam += $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings"};
 					
 						#Total W.O.
 						$ticketcount+= 1; #will have total number of tickets
@@ -3629,18 +3517,18 @@ while (my $inputfile = readdir(DIR))
 				
 				else #ticket end time after data end time, or it doesn't exist. 
 				{
-					${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"EndTime"} = "NULL"; 	#this deletes the ticket endtime if it existed, but it was out of bounds. 
+					$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"EndTime"} = "NULL"; 	#this deletes the ticket endtime if it existed, but it was out of bounds. 
 																						#This is good, since it fudges the fact that we decided to get the ticket lists late, lol
 					print "Ticket End time \"doesn't\" exist. Potential.\n";
-					if (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Below Set Point - Cooling/) 
+					if (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Below Set Point - Cooling/) 
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/) 
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Cooling event
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						#print "|";
 						my $translationHashRef = &sandwichSensorFudger();
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
@@ -3649,293 +3537,305 @@ while (my $inputfile = readdir(DIR))
 							my %active = activeCheckForDATDev($i);
 							unless ( $active{"activePercentage"} ) {next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"DATDevC"};
 						print "impact days are $impday\n";
 						$newAnom = "DAT Deviation";
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 						 
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Above Set Point - Heating/)
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Above Set Point - Heating/)
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Heating event
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						#print "|";
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
 						$impday = $annualize{$sitename}{"DATDevH"};
 						print "impact days are $impday\n";
 						$newAnom = "DAT Deviation"; 
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DAT Deviation";
 						$anom = $newAnom;
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DAT Above Set Point - Cooling/)
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Above Set Point - Cooling/)
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Greater/ ) )  ) #if it is DATDEV Cooling event, above set point. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DAT Deviation";
 						$anom = $newAnom;
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DSP Below Set Point/)
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Below Set Point/)
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/)
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Less/ ) )  ) #if it is DSPDev Below event. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DSP Deviation";
 						$anom = $newAnom;
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Overage Running Hours/)
-					|| (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Overage Running Hours/)
+					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
 						print $ooo $AHUname."\n";
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						my $translationHashRef = &sandwichSensorFudger();
 						#print "|";
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"OutofOcc"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"}; 
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}; 
 
 						 
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Leaky Damper/) ) #Leaky Damper
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Leaky Damper/) ) #Leaky Damper
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						my $translationHashRef = &sandwichSensorFudger();
 							
-							###Weekly Treatment Code###
-							$timeStart->subtract(days => 7);
-							$timeStart = Timeround($timeStart);
-							$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
-							$bobmarley = timeIndex(${$AHU{"TT"}}[-1], $timeStart);
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"} = $bobmarley + 1;
-							###Weekly Treatment Code###
+						###Weekly Treatment Code###
+						$timeStart->subtract(days => 7);
+						$timeStart = Timeround($timeStart);
+						$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
+						$bobmarley = timeIndex(${$AHU{"TT"}}[-1], $timeStart);
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
+						###Weekly Treatment Code###
+							
 						#print "|";
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &LeakyDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
+						
 						$impday = $annualize{$sitename}{"LeakyDamp"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"}; 
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}; 
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Stuck Damper/) ) #Stuck Damper
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Stuck Damper/) ) #Stuck Damper
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
-							
-							###Weekly Treatment Code###
-							$timeStart->subtract(days => 7);
-							$timeStart = Timeround($timeStart);
-							$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
-							$bobmarley = timeIndex(${$AHU{"TT"}}[-1], $timeStart);
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"} = $bobmarley + 1;
-							###Weekly Treatment Code###
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						my $translationHashRef = &sandwichSensorFudger();
+						
+						###Weekly Treatment Code###
+						$timeStart->subtract(days => 7);
+						$timeStart = Timeround($timeStart);
+						$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
+						$bobmarley = timeIndex(${$AHU{"TT"}}[-1], $timeStart);
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
+						###Weekly Treatment Code###
+						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &StuckDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
+						
 						$impday = $annualize{$sitename}{"StuckDamp"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"}; 
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}; 
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
 					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/) 
 					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						#print "|";
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &DSPDev($i, &REALLYMakeVFD($i, $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
 						$impday = $annualize{$sitename}{"DSPDev"};
 						print "impact days are $impday\n";
 						$newAnom = "DSP Deviation"; 
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} = $newAnom;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 
 						 
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Simultaneous Heat/) ) #
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Simultaneous Heat/) ) #
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						#print "|";
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &SimHC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
 
 						$impday = $annualize{$sitename}{"SimHC"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"};  
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"};  
 						 
 					}
-					elsif (  (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"} =~ m/Leaky Valve/) ) #
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Leaky Valve/) ) #
 					{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = 0;		#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 							
 							###Weekly Treatment Code###
 							$timeStart->subtract(days => 7);
 							$timeStart = Timeround($timeStart);
 							$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
 							$bobmarley = timeIndex(${$AHU{"TT"}}[-1], $timeStart);
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"} = $bobmarley + 1;
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
 							###Weekly Treatment Code###
 						#print "|";
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
 						}
 						$impday = $annualize{$sitename}{"LeakyVlv"};
 						print "impact days are $impday\n";
-						$newAnom = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Anomaly"}; 
+						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}; 
 					}
-					if(exists ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"})
+					if(exists $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"})
 					{
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} = $ConvElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} = $ConvGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = $ConvSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = $ConvElec*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = $ConvGas*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = $ConvSteam*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"};
 						
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec_dollar"} = $DollarElec*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas_dollar"} = $DollarGas*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"};
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam_dollar"} = $DollarSteam*${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec_dollar"} = $DollarElec*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas_dollar"} = $DollarGas*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"};
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam_dollar"} = $DollarSteam*$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"};
 						
-						${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"ImpactDays"} = $impday;
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"ImpactDays"} = $impday;
 						
 						
 						
-						if (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} == 0) #no active time stamps.
+						if ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} == 0) #no active time stamps.
 						{
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"} = 0; #elec annualized savings
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"} = 0; #steam
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"} = 0; #gas
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings"} = 0; #elec annualized savings
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings"} = 0; #steam
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings"} = 0; #gas
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"} = 0; #elec annualized savings
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"} = 0; #steam
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"} = 0; #gas
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"} = 0; #elec annualized savings
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"} = 0; #steam
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"} = 0; #gas
 							
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} = 0;
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Data Reliability"} = 0;
 						}
 						else 
 						{
-							$bobmarley = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"}/96;
+							$bobmarley = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"}/96;
 							
-							my $lilpony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"};
-							my $liltony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"};
-							my $lilrony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"};
+							my $lilpony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"};
+							my $liltony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"};
+							my $lilrony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"};
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"} = ($lilpony/$bobmarley)*$impday; #elec annualized savings
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"} = ($liltony/$bobmarley)*$impday; #steam
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"} = ($lilrony/$bobmarley)*$impday; #gas
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings"} = ($lilpony/$bobmarley)*$impday; #elec annualized savings
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings"} = ($liltony/$bobmarley)*$impday; #steam
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings"} = ($lilrony/$bobmarley)*$impday; #gas
 							
-							$lilpony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec_dollar"};
-							$liltony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam_dollar"};
-							$lilrony = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas_dollar"};
+							$lilpony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec_dollar"};
+							$liltony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam_dollar"};
+							$lilrony = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas_dollar"};
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"} = ($lilpony/$bobmarley)*$impday; #elec annualized savings
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"} = ($liltony/$bobmarley)*$impday; #steam
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"} = ($lilrony/$bobmarley)*$impday; #gas
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"} = ($lilpony/$bobmarley)*$impday; #elec annualized savings
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"} = ($liltony/$bobmarley)*$impday; #steam
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"} = ($lilrony/$bobmarley)*$impday; #gas
 							
 							
 							
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"}/${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"RealActiveStamps"};
-							if (${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} > 1){ ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Data Reliability"} = 1; }	
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Data Reliability"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"}/$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"};
+							if ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Data Reliability"} > 1){ $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Data Reliability"} = 1; }	
 						}
 						
 						
-						$AnnSum = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
+						$AnnSum = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"};
 						$AnnSumi = $AnnSum;
 						if($AnnSum > 0)	#if the ticket is non-zero
 						{
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"TicketAge"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"TicketAge"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSum"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSumb"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings_dollar"}+${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings_dollar"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnkWh"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
-							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"TicketAge"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"TicketAge"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSum"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnSumb"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings_dollar"}+$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings_dollar"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"AnnkWh"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Anngas"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings"};
+							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"Annsteam"} = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings"};
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"impday"} = $impday;
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeStart"} = $timeStart;
 							$latestAnnul{$AHUname}{$newAnom}{$ticketLevel}{"timeEnd"} = $timeEnd;
 						}
-						$AnnkWh += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized elec savings"};
-						$Anngas += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized gas savings"};
-						$Annsteam += ${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Annualized steam savings"};
+						$AnnkWh += $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized elec savings"};
+						$Anngas += $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized gas savings"};
+						$Annsteam += $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Annualized steam savings"};
 						#Total W.O.
 						$ticketcount += 1; #will have total number of tickets
 						#Algorithm
