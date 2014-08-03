@@ -1606,6 +1606,82 @@ while (my $inputfile = readdir(DIR))
 		return %active;
 	}
 	
+	# sub activeCheckForDATDev
+	# PURPOSE: Check points needed for DATDev
+	#
+	# INPUTS: 
+	#		PARAMETERS:
+	#			index ($i), $CFM
+	#		GLOBALS:
+	#			$AHUmap, %AHU, %AHUinfo
+	# RETURN: Hash of {"Point" -> Status} 
+	#		where status is the looks_like_number on that timestamp for that point    
+	#	hash also has a kay "activePercenage, which is 0 if req points are missing.
+	#
+	sub activeCheckForOutOfOcc
+	{
+		my $i = $_[0];
+		my $CFM = &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM);
+		my $VFD = &MakeVFD($i,REALLYMakeVFD($i, $MaxCFM));
+		
+		my %active = (
+			"SCH" => ( looks_like_number($SCH[$i]) > 0),
+			"SFS" => ( looks_like_number(&FanOn($i)) > 0)
+		);
+
+		foreach my $key (keys %active)
+		{
+			unless ($active{$key})	#if any are false
+			{
+				$active{"activePercentage"} = 0;
+			}
+		}
+		$active{"VFD"} = ( looks_like_number($VFD) > 0);	#MAT
+		$active{"CFM"} = ( looks_like_number($CFM) > 0);
+		
+		unless ($active{"VFD"}||$active{"CFM"})	#if both are false. DeMorgans ftw
+		{
+			$active{"activePercentage"} = 0;
+		}
+		
+		foreach my $lists ($AHUmap->getpaths)
+		{
+			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
+			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
+			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
+			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
+			foreach my $valve (@{$lists})
+			{
+				if($valve =~ m/D/) {next;}
+				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
+				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
+				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
+			}
+		}
+		foreach my $key (keys(%active))
+		{
+			$savings{"active"} += $active{$key};
+		}
+
+		if(exists $active{"activePercentage"})	#since this will only exist if there has been
+			#a previous required point failure, this will return activePercentage = 0
+			#this ensures this hash will always have all the points the
+			#analytic uses for calculation. Useful for diagnostic output
+		{
+			
+			return %active;
+		}
+		my $activePercentageNumerator = 0;
+		my $activePercentageDenominator = (scalar (keys(%active)));
+		foreach my $key (keys(%active))
+		{
+			$activePercentageNumerator += $active{$key};
+		}
+
+		$active{"activePercentage"} = $activePercentageNumerator/$activePercentageDenominator;
+		return %active;
+	}
+	
 	# sub sandwichSensorFudger
 	# PURPOSE: Imagine the following case: (there is no MAD/RAT)
 	#	OAD --- PHV --- CCV
@@ -3122,8 +3198,8 @@ while (my $inputfile = readdir(DIR))
 					print "Ticket End time before data end. Forreal.\n";
 					if (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Below Set Point - Cooling/) 
 					
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/) 
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Cooling event
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Cooling Capacity/) 
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Cooling event
 					{
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
@@ -3153,24 +3229,24 @@ while (my $inputfile = readdir(DIR))
 					}
 					#Marked for updating anomaly to be consistant.
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Heating Capacity/)
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DAT Deviation";
 						$anom = $newAnom;
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Above Set Point - Cooling/)
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/)
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Greater/ ) )  ) #if it is DATDEV Cooling event, above set point. Cannot calculate savings and such, assign new anomaly.
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Cooling Capacity/)
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature Greater/ ) )  ) #if it is DATDEV Cooling event, above set point. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DAT Deviation";
 						$anom = $newAnom;
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Below Set Point/)
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/)
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Less/ ) )  ) #if it is DSPDev Below event. Cannot calculate savings and such, assign new anomaly.
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/)
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Less/ ) )  ) #if it is DSPDev Below event. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DSP Deviation";
 						$anom = $newAnom;
@@ -3181,8 +3257,8 @@ while (my $inputfile = readdir(DIR))
 					
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Above Set Point - Heating/)
 					
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Heating event
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Heating Capacity/)
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Heating event
 					{
 						
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
@@ -3297,8 +3373,8 @@ while (my $inputfile = readdir(DIR))
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/) 
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/) 
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
 					{
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
@@ -3522,8 +3598,8 @@ while (my $inputfile = readdir(DIR))
 					print "Ticket End time \"doesn't\" exist. Potential.\n";
 					if (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Below Set Point - Cooling/) 
 					
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/) 
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Cooling event
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Cooling Capacity/) 
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Cooling event
 					{
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
@@ -3551,8 +3627,8 @@ while (my $inputfile = readdir(DIR))
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Above Set Point - Heating/)
 					
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Heating event
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Heating Capacity/)
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Heating event
 					{
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
@@ -3574,24 +3650,24 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Below Set Point - Heating/)
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Heating Capacity/)
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Heating Capacity/)
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Heating event, below set point. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DAT Deviation";
 						$anom = $newAnom;
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DAT Above Set Point - Cooling/)
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU Cooling Capacity/)
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Supply Air Temperature Greater/ ) )  ) #if it is DATDEV Cooling event, above set point. Cannot calculate savings and such, assign new anomaly.
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Cooling Capacity/)
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature Greater/ ) )  ) #if it is DATDEV Cooling event, above set point. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DAT Deviation";
 						$anom = $newAnom;
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Below Set Point/)
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/)
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Less/ ) )  ) #if it is DSPDev Below event. Cannot calculate savings and such, assign new anomaly.
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/)
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Less/ ) )  ) #if it is DSPDev Below event. Cannot calculate savings and such, assign new anomaly.
 					{
 						$newAnom = "DSP Deviation";
 						$anom = $newAnom;
@@ -3691,8 +3767,8 @@ while (my $inputfile = readdir(DIR))
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
-					|| ( (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Cause"} =~ m/AHU VFD Control/) 
-					&& (${${$ticket}{$sitename}{$AHUname}{$ticketLevel}}{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
+					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/) 
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
 					{
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.

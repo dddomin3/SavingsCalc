@@ -30,16 +30,16 @@ April 2014,0,0
 May 2014,2,0
 June 2014,0,0
 DAT Deviation,74.38290225581,0
-Leaky Damper,0,0
 Leaky Valve,0,0
 Stuck Damper,0,0
+Leaky Damper,0,0
 NULL,0,0
 NULL,0,0
 NULL,0,0
 NULL,0,0
 AHU1,74.38290225581,0
-AHU2,0,0
 AHU4,0,0
+AHU2,0,0
 NULL,0,0
 NULL,0,0
 NULL,0,0
