@@ -2067,48 +2067,6 @@ while (my $inputfile = readdir(DIR))
 							'active' => 0
 						);
 						
-		my %active = (
-			"SCH" => ( looks_like_number($SCH[$i]) > 0),
-			"SFS" => ( looks_like_number(&FanOn($i)) > 0)
-		);
-		print $ooo $AHU{"TT"}[$i].",".FanOn($i).",".$AHU{"SFS"}[$i].",".$AHU{"SCH"}[$i].",".$HP.",".$kWHP.",".$VFD.",".$AHU{"SupVFD1"}[$i];
-		foreach my $key (keys %active)
-		{
-			unless ($active{$key})	#if any are false
-			{
-				print $ooo ",0,0\n";
-				return %savings;
-			}
-		}
-		$active{"VFD"} = ( looks_like_number($VFD) > 0);	#MAT
-		$active{"CFM"} = ( looks_like_number($CFM) > 0);
-		
-		unless ($active{"VFD"}||$active{"CFM"})	#if both are false. DeMorgans ftw
-		{
-			print $ooo ",0,0\n";
-			return %savings;
-		}
-		
-		foreach my $lists ($AHUmap->getpaths)
-		{
-			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
-			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
-			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
-			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			foreach my $valve (@{$lists})
-			{
-				if($valve =~ m/D/) {next;}
-				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
-				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
-				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-			}
-		}
-		foreach my $key (keys(%active))
-		{
-			$savings{"active"} += $active{$key};
-		}
-
-		$savings{"active"} = $savings{"active"}/(scalar (keys(%active)));
 
 		if( @SCH&& ((scalar $AHUmap->getSF) > 0) )
 		{
@@ -2167,10 +2125,6 @@ while (my $inputfile = readdir(DIR))
 							'active' => 0
 						);
 						
-		my %realtb;
-		my %realta;
-		my %faketb;
-		my %faketa;
 		
 		
 		my %active = (
@@ -2412,10 +2366,6 @@ while (my $inputfile = readdir(DIR))
 							'active' => 0
 						);
 		
-		my %realtb;
-		my %realta;
-		my %faketb;
-		my %faketa;
 	
 		my %active = (
 			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
@@ -2529,10 +2479,6 @@ while (my $inputfile = readdir(DIR))
 			
 				my $OAD = PerFudge($AHUinfo{$sitename}{$AHUname}{"OADminSig"},$AHUinfo{$sitename}{$AHUname}{"OADmaxSig"},$OAD[$i]);         #minSig      $AHU{ $AHUmap->getvminSig(${$lists}[0])  }[$i]
 				
-				# print "OADta is $OADta[$i] \n";
-				# print "OADtb is $OADtb[$i] \n";
-				# print "OAD is $OAD \n";
-				# print "MADtb is $MADtb[$i] \n";
 				
 				#is the event happening? if so calc the max possible waste
 				if(looks_like_number($OAD)&&looks_like_number($OADtb[$i])
@@ -3298,11 +3244,14 @@ while (my $inputfile = readdir(DIR))
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
+							my %active = activeCheckForOutOfOcc($i);
+							unless ( $active{"activePercentage"} ) {next;}
+							
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						
@@ -3677,6 +3626,7 @@ while (my $inputfile = readdir(DIR))
 					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
 						print $ooo $AHUname."\n";
+						
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
@@ -3686,12 +3636,14 @@ while (my $inputfile = readdir(DIR))
 						#print "|";
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print $AHU{"TT"}[$i]."|";
+							my %active = activeCheckForOutOfOcc($i);
+							unless ( $active{"activePercentage"} ) {next;}
+							
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"OutofOcc"};
