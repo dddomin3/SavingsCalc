@@ -1597,6 +1597,7 @@ while (my $inputfile = readdir(DIR))
 		}
 		my $activePercentageNumerator = 0;
 		my $activePercentageDenominator = (scalar (keys(%active)));
+		
 		foreach my $key (keys(%active))
 		{
 			$activePercentageNumerator += $active{$key};
@@ -1658,17 +1659,12 @@ while (my $inputfile = readdir(DIR))
 				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
 			}
 		}
-		foreach my $key (keys(%active))
-		{
-			$savings{"active"} += $active{$key};
-		}
 
 		if(exists $active{"activePercentage"})	#since this will only exist if there has been
 			#a previous required point failure, this will return activePercentage = 0
 			#this ensures this hash will always have all the points the
 			#analytic uses for calculation. Useful for diagnostic output
 		{
-			
 			return %active;
 		}
 		my $activePercentageNumerator = 0;
@@ -1947,7 +1943,92 @@ while (my $inputfile = readdir(DIR))
 	#
 	sub activeCheckForLeakyValve
 	{
-	
+		my $i = $_[0];
+		my $CFM = &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM);
+		
+		my %active = (
+			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
+			"SCH" => ( looks_like_number($SCH[$i]) > 0),
+			"SFS" => ( looks_like_number(&FanOn($i)) > 0),
+			"CFM" => ( looks_like_number($CFM) > 0)
+		);
+		
+		foreach my $key (keys %active)
+		{
+			unless ($active{$key})	#if any are false
+			{
+				$active{"activePercentage"} = 0;
+			}
+		}
+		my @fatalPath;
+		foreach my $lists ($AHUmap->getpaths)
+		{
+			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
+			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
+			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
+			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
+			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
+			{
+				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
+				next;	#no point of continuing after this.
+			}
+			my @fatalValve;
+			foreach my $valve (@{$lists})
+			{
+				if($valve =~ m/D/) {next;}
+				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
+				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
+				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
+				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
+				{
+					push @fatalValve, 1;	#if these are all fatal, then path is fatal
+				}
+				else
+				{
+					push @fatalValve, 0;
+				}
+			}
+			my $fatalvFailure = 0;
+			foreach my $fatal (@fatalValve)
+			{
+				$fatalvFailure += $fatal;
+			}
+			if($fatalvFailure == scalar(@fatalValve))	#only if all valves were fatal
+			{
+				push @fatalPath, 1;
+			}
+			else
+			{
+				push @fatalPath, 0;
+			}
+		}
+		my $fatalpFailure = 0;
+		foreach my $fatal (@fatalPath)
+		{
+			$fatalpFailure += $fatal;
+		}
+		
+		if($fatalpFailure == scalar(@fatalPath))	#only if all paths were fatal
+		{
+			$active{"activePercentage"} = 0;
+		}
+		
+		if(exists $active{"activePercentage"})	#since this will only exist if there has been
+			#a previous required point failure, this will return activePercentage = 0
+			#this ensures this hash will always have all the points the
+			#analytic uses for calculation. Useful for diagnostic output
+		{
+			return %active;
+		}
+		my $activePercentageNumerator = 0;
+		my $activePercentageDenominator = (scalar (keys(%active)));
+		foreach my $key (keys(%active))
+		{
+			$activePercentageNumerator += $active{$key};
+		}
+
+		$active{"activePercentage"} = $activePercentageNumerator/$activePercentageDenominator;
+		return %active;
 	}
 	#######
 	
@@ -3098,80 +3179,7 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
-		my %active = (
-			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
-			"SCH" => ( looks_like_number($SCH[$i]) > 0),
-			"SFS" => ( looks_like_number(&FanOn($i)) > 0),
-			"CFM" => ( looks_like_number($CFM) > 0)
-		);
-		
-		foreach my $key (keys %active)
-		{
-			unless ($active{$key})	#if any are false
-			{
-				return %savings;
-			}
-		}
-		my @fatalPath;
-		foreach my $lists ($AHUmap->getpaths)
-		{
-			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
-			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
-			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
-			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
-			my @fatalValve;
-			foreach my $valve (@{$lists})
-			{
-				if($valve =~ m/D/) {next;}
-				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
-				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
-				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
-				{
-					push @fatalValve, 1;	#if these are all fatal, then path is fatal
-				}
-				else
-				{
-					push @fatalValve, 0;
-				}
-			}
-			my $fatalvFailure = 0;
-			foreach my $fatal (@fatalValve)
-			{
-				$fatalvFailure += $fatal;
-			}
-			if($fatalvFailure == scalar(@fatalValve))	#only if all valves were fatal
-			{
-				push @fatalPath, 1;
-			}
-			else
-			{
-				push @fatalPath, 0;
-			}
-		}
-		my $fatalpFailure = 0;
-		foreach my $fatal (@fatalPath)
-		{
-			$fatalpFailure += $fatal;
-		}
-		
-		if($fatalpFailure == scalar(@fatalPath))	#only if all paths were fatal
-		{
-			return %savings;
-		}
-		
-		foreach my $key (keys(%active))
-		{
-			$savings{"active"} += $active{$key};
-		}
 
-		$savings{"active"} = $savings{"active"}/(scalar (keys(%active)));
-		
 		if( @SCH&& ((scalar $AHUmap->getSF) > 0) )
 		{
 			if( ( looks_like_number($SCH[$i]) )&&( looks_like_number(&FanOn($i)) )&&(&FanOn($i))&&($SCH[$i])&&looks_like_number($CFM) )
@@ -3558,12 +3566,14 @@ while (my $inputfile = readdir(DIR))
 						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
+							my %active = activeCheckForLeakyValve($i);
+							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
 						$impday = $annualize{$sitename}{"LeakyVlv"};
 						print "impact days are $impday\n";
@@ -3759,12 +3769,14 @@ while (my $inputfile = readdir(DIR))
 						#print "|";
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print $AHU{"TT"}[$i]."|";
+							my %active = activeCheckForDATDev($i);
+							unless ( $active{"activePercentage"} ) {next;}
+							
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
 						$impday = $annualize{$sitename}{"DATDevH"};
 						print "impact days are $impday\n";
@@ -3948,27 +3960,29 @@ while (my $inputfile = readdir(DIR))
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Leaky Valve/) ) #
 					{
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
-							
-							###Weekly Treatment Code###
-							$timeStart->subtract(days => 7);
-							$timeStart = Timeround($timeStart);
-							$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
-							$bobmarley = timeIndex(${$AHU{"TT"}}[-1], $timeStart);
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
-							###Weekly Treatment Code###
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						###Weekly Treatment Code###
+						$timeStart->subtract(days => 7);
+						$timeStart = Timeround($timeStart);
+						$ticketIndex = timeIndex ($timeStart, ${$AHU{"TT"}}[0]);
+						$bobmarley = timeIndex(${$AHU{"TT"}}[-1], $timeStart);
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
+						###Weekly Treatment Code###
+
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print $AHU{"TT"}[$i]."|";
+							my %active = activeCheckForLeakyValve($i);
+							unless ( $active{"activePercentage"} ) {next;}
+							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $datsave{"active"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
 						$impday = $annualize{$sitename}{"LeakyVlv"};
 						print "impact days are $impday\n";
