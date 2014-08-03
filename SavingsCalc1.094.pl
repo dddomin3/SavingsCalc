@@ -1627,39 +1627,45 @@ while (my $inputfile = readdir(DIR))
 	
 	sub sandwichSensorFudger
 	{
-		my $returnRealFakeTranslationHash = {};
+		my %returnRealFakeTranslationHash = 
+		(
+			"realtb" => {},
+			"realta" => {},
+			"faketa" => {},
+			"faketb" => {},
+		);
 		foreach my $valve ($AHUmap->getVlv)
 		{
 			if(   (  ( scalar (@{$AHUmap->prevValve($valve)}) ) == 1  )&&($AHUmap->getvtb($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the tb m/NODE/...
 			{
-				my $prevValve = ${$AHUmap->prevValve($valve)}[0];
+				my $prevValve = $AHUmap->prevValve($valve)->[0];
 				unless (  (( $AHUmap->getvtb($valve) eq $MADta )||( $prevValve eq "OAD" )) || (  ( ($valve =~ m/C/)&&($prevValve =~m/C/) )||( ($valve =~ m/H/)&&($prevValve =~m/H/) )  ) ) 
 				#make sure it doesn't fudge nodes with mix air ducts, or does anything weird with how OAT is treated previously. ALSO that the valves aren't the same type
 				{
-					$returnRealFakeTranslationHash->{"realtb"}->{$valve} = $AHUmap->getvtb($valve);
-					$returnRealFakeTranslationHash->{"faketb"}->{$valve} = $AHUmap->getvtb($prevValve);
+					$returnRealFakeTranslationHash{"realtb"}->{$valve} = $AHUmap->getvtb($valve);
+					$returnRealFakeTranslationHash{"faketb"}->{$valve} = $AHUmap->getvtb($prevValve);
 				}
 			}
 			if(   (  ( scalar (@{$AHUmap->nextValve($valve)}) ) == 1  )&&($AHUmap->getvta($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the ta m/NODE/...
 			{
-				my $nextValve = ${$AHUmap->nextValve($valve)}[0];
+				my $nextValve = $AHUmap->nextValve($valve)->[0];
 				unless ( ( $AHUmap->getvta($valve) eq $MADta ) || (  ( ($valve =~ m/C/)&&($nextValve =~m/C/) )||( ($valve =~ m/H/)&&($nextValve =~m/H/) )  ) ) 
 				#make sure it fudges nodes with mix air ducts. ALSO that the valves aren't the same type
 				{
-					$returnRealFakeTranslationHash->{"realta"}->{$valve} = $AHUmap->getvta($valve);
-					$returnRealFakeTranslationHash->{"faketa"}->{$valve} = $AHUmap->getvta($nextValve);
+					$returnRealFakeTranslationHash{"realta"}->{$valve} = $AHUmap->getvta($valve);
+					$returnRealFakeTranslationHash{"faketa"}->{$valve} = $AHUmap->getvta($nextValve);
 				}	
 			}
 		}
-		foreach my $valve (  keys( %{$returnRealFakeTranslationHash->{"faketb"}} )  )	#replaces the ta and tbs with their actual quantities
+		foreach my $valve (  keys( %{$returnRealFakeTranslationHash{"faketb"}} )  )	#replaces the ta and tbs with their actual quantities
 		{
-			$AHUmap->setvtb($valve, $returnRealFakeTranslationHash->{"faketb"}->{$valve});
+			$AHUmap->setvtb($valve, $returnRealFakeTranslationHash{"faketb"}->{$valve});
 		}
-		foreach my $valve (  keys( %{ $returnRealFakeTranslationHash->{"faketb"} } )  )
+		foreach my $valve (  keys( %{ $returnRealFakeTranslationHash{"faketa"} } )  )
 		{
-			$AHUmap->setvta($valve, $returnRealFakeTranslationHash->{"faketa"}->{$valve});
+			$AHUmap->setvta($valve, $returnRealFakeTranslationHash{"faketa"}->{$valve});
 		}
-		return $returnRealFakeTranslationHash;
+		return \%returnRealFakeTranslationHash;
 	}
 	
 	# sub sandwichSensorUnfudger
@@ -1676,7 +1682,6 @@ while (my $inputfile = readdir(DIR))
 	sub sandwichSensorUnfudger
 	{
 		my $inputRealFakeTranslationHash = $_[0];
-		
 		foreach my $valve (keys(%{ $inputRealFakeTranslationHash->{"realtb"} }))	#replaces the ta and tbs with their actual quantities
 		{
 			$AHUmap->setvtb($valve, $inputRealFakeTranslationHash->{"realtb"}->{$valve});
@@ -1696,46 +1701,6 @@ while (my $inputfile = readdir(DIR))
 
 		my $i = $_[0];
 		my $CFM = $_[1];
-		my %realtb;
-		my %realta;
-		my %faketb;
-		my %faketa;
-		
-		#{
-		
-		 #This is the code that deals with missing sensors between two valves
-			foreach my $valve ($AHUmap->getVlv)
-			{
-				if(   (  ( scalar (@{$AHUmap->prevValve($valve)}) ) == 1  )&&($AHUmap->getvtb($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the tb m/NODE/...
-				{
-					my $prevValve = ${$AHUmap->prevValve($valve)}[0];
-					unless (  (( $AHUmap->getvtb($valve) eq $MADta )||( $prevValve eq "OAD" )) || (  ( ($valve =~ m/C/)&&($prevValve =~m/C/) )||( ($valve =~ m/H/)&&($prevValve =~m/H/) )  ) ) 
-					#make sure it doesn't fudge nodes with mix air ducts, or does anything weird with how OAT is treated previously. ALSO that the valves aren't the same type
-					{
-						$realtb{$valve} = $AHUmap->getvtb($valve);
-						$faketb{$valve} = $AHUmap->getvtb($prevValve);
-					}
-				}
-				if(   (  ( scalar (@{$AHUmap->nextValve($valve)}) ) == 1  )&&($AHUmap->getvta($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the ta m/NODE/...
-				{
-					my $nextValve = ${$AHUmap->nextValve($valve)}[0];
-					unless ( ( $AHUmap->getvta($valve) eq $MADta ) || (  ( ($valve =~ m/C/)&&($nextValve =~m/C/) )||( ($valve =~ m/H/)&&($nextValve =~m/H/) )  ) ) 
-					#make sure it fudges nodes with mix air ducts. ALSO that the valves aren't the same type
-					{
-						$realta{$valve} = $AHUmap->getvta($valve);
-						$faketa{$valve} = $AHUmap->getvta($nextValve);
-					}	
-				}
-			}
-			foreach my $valve (keys(%faketb))	#replaces the ta and tbs with their fake quantities
-			{
-				$AHUmap->setvtb($valve, $faketb{$valve});
-			}
-			foreach my $valve (keys(%faketa))
-			{
-				$AHUmap->setvta($valve, $faketa{$valve});
-			}
-		#}
 		
 		my %BUCKETZ;
 		
@@ -1745,79 +1710,6 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
-		my %active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
-			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
-			"SCH" => ( looks_like_number($SCH[$i]) > 0),
-			"SFS" => ( looks_like_number(&FanOn($i)) > 0),
-			"CFM" => ( looks_like_number($CFM) > 0)
-		);
-		
-		foreach my $key (keys %active)
-		{
-			unless ($active{$key})	#if any are false
-			{
-				return %savings;
-			}
-		}
-		my @fatalPath;
-		foreach my $lists ($AHUmap->getpaths)
-		{
-			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
-			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
-			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
-			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
-			my @fatalValve;
-			foreach my $valve (@{$lists})
-			{
-				if($valve =~ m/D/) {next;}
-				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
-				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
-				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
-				{
-					push @fatalValve, 1;	#if these are all fatal, then path is fatal
-				}
-				else
-				{
-					push @fatalValve, 0;
-				}
-			}
-			my $fatalvFailure = 0;
-			foreach my $fatal (@fatalValve)
-			{
-				$fatalvFailure += $fatal;
-			}
-			if($fatalvFailure == scalar(@fatalValve))	#only if all valve paths were fatal
-			{
-				push @fatalPath, 1;
-			}
-			else
-			{
-				push @fatalPath, 0;
-			}
-		}
-		my $fatalpFailure = 0;
-		foreach my $fatal (@fatalPath)
-		{
-			$fatalpFailure += $fatal;
-		}
-		
-		if($fatalpFailure == scalar(@fatalPath))
-		{
-			return %savings;
-		}
-		
-		foreach my $key (keys(%active))
-		{
-			$savings{"active"} += $active{$key};
-		}
-
-		$savings{"active"} = $savings{"active"}/(scalar (keys(%active)));
 
 		if( @SCH&& ((scalar $AHUmap->getSF) > 0) )
 		{
@@ -1938,14 +1830,6 @@ while (my $inputfile = readdir(DIR))
 				}
 			}
 		}
-		foreach my $valve (keys(%realtb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $realtb{$valve});
-		}
-		foreach my $valve (keys(%realta))
-		{
-			$AHUmap->setvta($valve, $realta{$valve});
-		}
 		return %savings;
 	}
 	
@@ -1956,44 +1840,7 @@ while (my $inputfile = readdir(DIR))
 	{
 		my $i = $_[0];
 		my $CFM = $_[1];
-		my %realtb;
-		my %realta;
-		my %faketb;
-		my %faketa;
 		
-		#{ This is the code that deals with missing sensors between two valves
-		foreach my $valve ($AHUmap->getVlv)
-		{
-			if(   (  ( scalar (@{$AHUmap->prevValve($valve)}) ) == 1  )&&($AHUmap->getvtb($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the tb m/NODE/...
-			{
-				my $prevValve = ${$AHUmap->prevValve($valve)}[0];
-				unless (  (( $AHUmap->getvtb($valve) eq $MADta )||( $prevValve eq "OAD" )) || (  ( ($valve =~ m/C/)&&($prevValve =~m/C/) )||( ($valve =~ m/H/)&&($prevValve =~m/H/) )  ) ) 
-				#make sure it doesn't fudge nodes with mix air ducts, or does anything weird with how OAT is treated previously. ALSO that the valves aren't the same type
-				{
-					$realtb{$valve} = $AHUmap->getvtb($valve);
-					$faketb{$valve} = $AHUmap->getvtb($prevValve);
-				}
-			}
-			if(   (  ( scalar (@{$AHUmap->nextValve($valve)}) ) == 1  )&&($AHUmap->getvta($valve) =~ m/NODE/)   )    #if there is only one valve before it, and the ta m/NODE/...
-			{
-				my $nextValve = ${$AHUmap->nextValve($valve)}[0];
-				unless ( ( $AHUmap->getvta($valve) eq $MADta ) || (  ( ($valve =~ m/C/)&&($nextValve =~m/C/) )||( ($valve =~ m/H/)&&($nextValve =~m/H/) )  ) ) 
-				#make sure it fudges nodes with mix air ducts. ALSO that the valves aren't the same type
-				{
-					$realta{$valve} = $AHUmap->getvta($valve);
-					$faketa{$valve} = $AHUmap->getvta($nextValve);
-				}	
-			}
-		}
-		foreach my $valve (keys(%faketb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $faketb{$valve});
-		}
-		foreach my $valve (keys(%faketa))
-		{
-			$AHUmap->setvta($valve, $faketa{$valve});
-		}
-		#}
 		my %BUCKETZ;
 		
 		my %savings =	(	
@@ -2002,83 +1849,7 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
-		my %active = (	#these should be 100% REQUIRED points. Without these points, there's no point of going further
-			"MAT" => ( looks_like_number($MAT[$i])) ? 1 : 0,	#MAT
-			"SCH" => ( looks_like_number($SCH[$i])) ? 1 : 0,
-			"SFS" => ( looks_like_number(&FanOn($i))) ? 1 : 0,
-			"CFM" => ( looks_like_number($CFM)) ? 1 : 0
-		);
-		
-		foreach my $key (keys %active)
-		{
-			unless ($active{$key})	#if any are false
-			{
-				return %savings;
-			}
-		}
-		my @fatalPath;
-		foreach my $lists ($AHUmap->getpaths)
-		{
-			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
-			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
-			$active{$sDAT} = (looks_like_number($AHU{$sDAT}[$i])) ? 1 : 0;
-			$active{$sDATSP} = (looks_like_number($AHU{$sDATSP}[$i])) ? 1 : 0; #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
-			my @fatalValve;
-			foreach my $valve (@{$lists})
-			{	
-				if($valve =~ m/D/) {next;}
-				$active{$valve} = (looks_like_number($AHU{$valve}[$i])) ? 1 : 0;
-				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i])) ? 1 : 0;
-				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i])) ? 1 : 0;
-				unless( ($active{$AHUmap->getvta($valve)})&&($active{$AHUmap->getvtb($valve)})&&($active{$valve}) )	#if you have all three points
-				{
-					push @fatalValve, 1;
-				}
-				else
-				{
-					push @fatalValve, 0;	#if these are all fatal, then path is fatal
-				}
-			}
-			my $fatalvFailure = 0;
-			foreach my $fatal (@fatalValve)
-			{
-				$fatalvFailure += $fatal;
-			}
-			if($fatalvFailure == scalar(@fatalValve))	#only if all valves were fatal
-			{
-				push @fatalPath, 1;
-			}
-			else
-			{
-				push @fatalPath, 0;
-			}
-			#print Dumper \@fatalPath;
-		}
-		my $fatalpFailure = 0;
-		foreach my $fatal (@fatalPath)
-		{
-			$fatalpFailure += $fatal;
-		}
-		if($fatalpFailure == scalar(@fatalPath))	#only if all paths were fatal
-		{
-			return %savings;
-		}
-		
-		foreach my $key (keys(%active))
-		{
-			$savings{"active"} += $active{$key};
-		}
-
-		$savings{"active"} = $savings{"active"}/(scalar (keys(%active)));
-		# print Dumper \%active;
-		# print Dumper \%savings;
-		# print Dumper \@fatalPath;
-		# die;
+						
 		if( @SCH&& ((scalar $AHUmap->getSF) > 0) )
 		{
 			if( ( looks_like_number($SCH[$i]) )&&( looks_like_number(&FanOn($i)) )&&(&FanOn($i))&&($SCH[$i])&&( looks_like_number($CFM) ) )
@@ -2200,14 +1971,7 @@ while (my $inputfile = readdir(DIR))
 				}
 			}
 		}
-		foreach my $valve (keys(%realtb))	#replaces the ta and tbs with their actual quantities
-		{
-			$AHUmap->setvtb($valve, $realtb{$valve});
-		}
-		foreach my $valve (keys(%realta))
-		{
-			$AHUmap->setvta($valve, $realta{$valve});
-		}
+
 		return %savings;
 	}
 	
@@ -3488,15 +3252,22 @@ while (my $inputfile = readdir(DIR))
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} = 0;	#forreal.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
 						#print "|";
+						print "fudge\n";
+						my $translationHashRef = &sandwichSensorFudger();
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
+							my %active = activeCheckForDATDev($i);
+							unless ( $active{"activePercentage"} ) {print "kew"; next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $active{"activePercentage"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
+						
 						$impday = $annualize{$sitename}{"DATDevC"};
 						print "impact days are $impday\n";
 						$newAnom = "DAT Deviation";
@@ -3871,6 +3642,7 @@ while (my $inputfile = readdir(DIR))
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} = 0;	#fofake.
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} = 0;	#forreal.
 						#print "|";
+						my $translationHashRef = &sandwichSensorFudger();
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
@@ -3880,6 +3652,7 @@ while (my $inputfile = readdir(DIR))
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"DATDevC"};
 						print "impact days are $impday\n";
 						$newAnom = "DAT Deviation";
