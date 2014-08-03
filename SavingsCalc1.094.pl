@@ -3259,7 +3259,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %active = activeCheckForDATDev($i);
-							unless ( $active{"activePercentage"} ) {print "kew"; next;}
+							unless ( $active{"activePercentage"} ) {next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings elec"} += $datsave{"elec"};
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Realized Savings gas"} += $datsave{"gas"};
@@ -3646,11 +3646,13 @@ while (my $inputfile = readdir(DIR))
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
+							my %active = activeCheckForDATDev($i);
+							unless ( $active{"activePercentage"} ) {next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings elec"} += $datsave{"elec"};
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings gas"} += $datsave{"gas"};
 							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"Potential Savings steam"} += $datsave{"steam"};
-							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $datsave{"active"};
+							${$ticket}{$sitename}{$AHUname}{$ticketLevel}{"CalcActive"} += $active{"activePercentage"};
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"DATDevC"};
