@@ -4459,24 +4459,25 @@ foreach my $SITE (keys (%stdname))
 }
 close(NAME);
 
-open (TOT, ">" ,"totalsavings_save.csv") or die $!;
-#totalsavings_save.csv creation
-print TOT "Site,Unit,";
-foreach my $key (@savingskey)
-{
-	print TOT "$key,";
-}
-print TOT "\n";
-foreach my $AHUname (keys %{$savingstot{$sitename}}) #for every AHU in the site
-#This loop prints out savings
-{
-	print TOT "$sitename,$AHUname,";
-	foreach my $key (@savingskey)
-	{
-		print TOT "$savingstot{$sitename}{$AHUname}{$key},";
-	}
-	print TOT "\n";
-}
+# open (TOT, ">" ,"totalsavings_save.csv") or die $!;
+# #totalsavings_save.csv creation
+# print TOT "Site,Unit,";
+# foreach my $key (@savingskey)
+# {
+	# print TOT "$key,";
+# }
+# print TOT "\n";
+# foreach my $AHUname (keys %{$savingstot{$sitename}}) #for every AHU in the site
+# #This loop prints out savings
+# {
+	# print TOT "$sitename,$AHUname,";
+	# foreach my $key (@savingskey)
+	# {
+		# print TOT "$savingstot{$sitename}{$AHUname}{$key},";
+	# }
+	# print TOT "\n";
+# }
+
 print $ft Dumper \%{$ticket}; #print the hash using the reference hash
 
 #print Dumper \%latestAnnul;
