@@ -1,40 +1,79 @@
 Event ID,Facility,Asset,Created Time,SetClosedTime,Anomaly,Status,Cause,Effect,Source,ReturnStatus,Comments
-MCD-0116956,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116955,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116954,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116953,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116952,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116951,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116950,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116949,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116948,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116947,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116946,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116945,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116944,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116943,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116942,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116941,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116940,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116939,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116938,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116937,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116936,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116935,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116934,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116933,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116932,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116931,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116930,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116929,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116928,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116927,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116926,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116925,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116924,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116923,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116922,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116921,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116920,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116919,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
-MCD-0116918,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 
+FKE-0116956,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 1
+FKE-0116955,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 2
+FKE-0116954,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 3
+FKE-0116953,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 4
+FKE-0116952,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 5
+FKE-0116951,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 6
+FKE-0116950,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 7
+FKE-0116949,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 8
+FKE-0116948,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 9
+FKE-0116947,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 10
+FKE-0116946,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 11
+FKE-0116945,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 12
+FKE-0116944,FAKE,AHU1,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 13
+FKE-0116943,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 14
+FKE-0116942,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 15
+FKE-0116941,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 16
+FKE-0116940,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 17
+FKE-0116939,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 18
+FKE-0116938,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 19
+FKE-0116937,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 20
+FKE-0116936,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 21
+FKE-0116935,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 22
+FKE-0116934,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 23
+FKE-0116933,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 24
+FKE-0116932,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 25
+FKE-0116931,FAKE,AHU4,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 26
+FKE-0116930,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 27
+FKE-0116929,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 28
+FKE-0116928,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 29
+FKE-0116927,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 30
+FKE-0116926,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 31
+FKE-0116925,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 32
+FKE-0116924,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 33
+FKE-0116923,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 34
+FKE-0116922,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 35
+FKE-0116921,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 36
+FKE-0116920,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 37
+FKE-0116919,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 38
+FKE-0116918,FAKE,AHU5,"Feb 28, 2014 22:28:11 CST","May 16, 2014 10:25:19 CDT",Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 39
+FKE-0116917,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 40
+FKE-0116916,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 41
+FKE-0116915,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 42
+FKE-0116914,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 43
+FKE-0116913,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 44
+FKE-0116912,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 45
+FKE-0116911,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 46
+FKE-0116910,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 47
+FKE-0116909,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 48
+FKE-0116908,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 49
+FKE-0116907,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 50
+FKE-0116906,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 51
+FKE-0116905,FAKE,AHU1,"May 16, 2014 10:25:19 CDT",,Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 52
+FKE-0116904,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 53
+FKE-0116903,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 54
+FKE-0116902,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 55
+FKE-0116901,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 56
+FKE-0116900,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 57
+FKE-0116899,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 58
+FKE-0116898,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 59
+FKE-0116897,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 60
+FKE-0116896,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 61
+FKE-0116895,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 62
+FKE-0116894,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 63
+FKE-0116893,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 64
+FKE-0116892,FAKE,AHU4,"May 16, 2014 10:25:19 CDT",,Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 65
+FKE-0116891,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 66
+FKE-0116890,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 67
+FKE-0116889,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,DAT Below Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 68
+FKE-0116888,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Leaky Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 69
+FKE-0116887,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,DAT Above Set Point - Cooling Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 70
+FKE-0116886,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,DAT Below Set Point - Heating Control Logic Failure,Closed,,,Analytic,Good Feedback,Honeywell found a bad 71
+FKE-0116885,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Improper Economizing,Closed,,,Analytic,Good Feedback,Honeywell found a bad 72
+FKE-0116884,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Overage Running Hours,Closed,,,Analytic,Good Feedback,Honeywell found a bad 73
+FKE-0116883,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Leaky Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 74
+FKE-0116882,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Stuck Valve,Closed,,,Analytic,Good Feedback,Honeywell found a bad 75
+FKE-0116881,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Stuck Damper,Closed,,,Analytic,Good Feedback,Honeywell found a bad 76
+FKE-0116880,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,DSP Above Set Point,Closed,,,Analytic,Good Feedback,Honeywell found a bad 77
+FKE-0116879,FAKE,AHU5,"May 16, 2014 10:25:19 CDT",,Simultaneous Heating and Cooling,Closed,,,Analytic,Good Feedback,Honeywell found a bad 78

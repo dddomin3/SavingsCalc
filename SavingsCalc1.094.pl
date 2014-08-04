@@ -5,8 +5,12 @@
 
 open(my $dbg, '>', 'dbg.txt') or die "Could not open file";	#for dumpers since DateTime is fucking annoying, goddamn
 open(my $ft, '>', 'HistoryConsole_save.pl');
-open(my $ooo, '>', 'outofocc_save.pl');
-print $ooo "Timestamp,CalcSFS,SFS,SCH,HP,kWHP,CalcVFD,SupVFD,elecsave,active\n";
+open(my $diagOutOfOcc, '>', 'diagOutOfOcc_save.csv');
+open(my $diagSimHC, '>', 'diagSimHC_save.csv');
+open(my $diagLeakyStuckDamper, '>', 'diagLeakyStuckDamper_save.csv');
+open(my $diagLeakyValve, '>', 'diagLeakyValve_save.csv');
+open(my $diagDATDev, '>', 'diagDATDev_save.csv');
+open(my $diagDSPDev, '>', 'diagDSPDev_save.csv');
 
 use warnings "all";
 use strict;
@@ -1511,7 +1515,7 @@ while (my $inputfile = readdir(DIR))
 	#
 	# INPUTS: 
 	#		PARAMETERS:
-	#			index ($i), $CFM
+	#			index ($i)
 	#		GLOBALS:
 	#			$AHUmap, %AHU, %AHUinfo
 	# RETURN: Hash of {"Point" -> Status} 
@@ -1542,11 +1546,6 @@ while (my $inputfile = readdir(DIR))
 			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
 			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
 			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
 			my @fatalValve;
 			foreach my $valve (@{$lists})
 			{
@@ -1554,7 +1553,7 @@ while (my $inputfile = readdir(DIR))
 				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
 				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
 				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
+				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve}&&$active{$sDAT}&&$active{$sDATSP} )	#if you are missing any one of tb or ta or valve signal
 				{
 					push @fatalValve, 1;	#if these are all fatal, then path is fatal
 				}
@@ -1720,11 +1719,7 @@ while (my $inputfile = readdir(DIR))
 			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
 			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
 			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
+
 			my @fatalValve;
 			foreach my $valve (@{$lists})
 			{
@@ -1732,7 +1727,7 @@ while (my $inputfile = readdir(DIR))
 				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
 				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
 				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
+				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve}&&$active{$sDAT}&&$active{$sDATSP} )	#if you are missing any one of tb or ta or valve signal
 				{
 					push @fatalValve, 1;	#if these are all fatal, then path is fatal
 				}
@@ -1865,11 +1860,7 @@ while (my $inputfile = readdir(DIR))
 			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
 			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
 			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
+			
 			my @fatalValve;
 			foreach my $valve (@{$lists})
 			{
@@ -1877,7 +1868,7 @@ while (my $inputfile = readdir(DIR))
 				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
 				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
 				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
+				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve}&&$active{$sDAT}&&$active{$sDATSP} )	#if you are missing any one of tb or ta or valve signal
 				{
 					push @fatalValve, 1;	#if these are all fatal, then path is fatal
 				}
@@ -1967,11 +1958,7 @@ while (my $inputfile = readdir(DIR))
 			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
 			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
 			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
+			
 			my @fatalValve;
 			foreach my $valve (@{$lists})
 			{
@@ -1979,7 +1966,7 @@ while (my $inputfile = readdir(DIR))
 				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
 				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
 				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
+				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve}&&$active{$sDAT}&&$active{$sDATSP} )	#if you are missing any one of tb or ta or valve signal
 				{
 					push @fatalValve, 1;	#if these are all fatal, then path is fatal
 				}
@@ -2029,6 +2016,75 @@ while (my $inputfile = readdir(DIR))
 
 		$active{"activePercentage"} = $activePercentageNumerator/$activePercentageDenominator;
 		return %active;
+	}
+	
+	# sub diagFileTranslator
+	# PURPOSE: Decodes the header names outputted by the active hash and spits out
+	#			the line necessary
+	# INPUTS: 
+	#		PARAMETERS:
+	#			index ($i), $active{"activePercentage"}, header array ref
+	#		GLOBALS:
+	#			$AHUmap, %AHU, %AHUinfo, %global
+	# RETURN: output string 
+	#
+	sub diagFileTranslator
+	{
+		my $i = $_[0];
+		my $activePercentage = $_[1];
+		my $header = $_[2];
+		my $CFM = &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM);
+		my $VFD = MakeVFD($i,REALLYMakeVFD($i, $MaxCFM));
+		my $returnString = "";
+		foreach my $point ( @{ $header } )
+		{
+			if ($point eq "MAT") { $returnString .= $MAT[$i].","; }
+			elsif ($point eq "SCH") { $returnString .= $SCH[$i].","; }
+			elsif ($point eq "CFM") { $returnString .= $CFM.","; }
+			elsif ($point eq "VFD") { $returnString .= $VFD.","; }
+			elsif ($point eq "SFS") { $returnString .= &FanOn($i).","; }
+			elsif ($point eq "RAT") { $returnString .= $RAT[$i].","; }
+			elsif ($point eq "HP") { $returnString .= $HP.","; }
+			elsif ($point eq "MADta") { $returnString .= $MADta[$i].","; }
+			elsif ($point eq "MADtb") { $returnString .= $MADtb[$i].","; }
+			elsif ($point eq "MAD") { $returnString .= $MAD[$i].","; }
+			elsif ($point eq "OAD") { $returnString .= $OAD[$i].","; }
+			elsif ($point eq "OADtb") { $returnString .= $OADtb[$i].","; }
+			elsif ($point eq "OADta") { $returnString .= $OADta[$i].","; }
+			elsif ($point eq "MADtb") { $returnString .= $MADtb[$i].","; }
+			elsif ($point eq "DSP") { $returnString .= $DSP[$i].","; }
+			elsif ($point eq "DSPSP") { $returnString .= $DSPSP[$i].","; }
+			elsif ($point eq "DSPdb") { $returnString .= $DSPdb.","; }
+			elsif ($point eq "activePercentage") { $returnString .= $activePercentage.","; }
+			elsif (exists $AHU{$point}) { $returnString .= $AHU{$point}[$i].","; }
+			elsif (exists $global{$point}) { $returnString .= $global{$point}[$i].","; }
+			else { die $point; }
+		}
+		$returnString .= "\n";
+		return $returnString;
+	}
+	
+	# sub diagFileSorter
+	# PURPOSE: sorts the keys of the outputs from activeChecks
+	#			so the diag Files can print correctly
+	# INPUTS: 
+	#		PARAMETERS:
+	#			output hash turned into a REFERENCE from activeCheck<Analytic>(0)
+	#		
+	# RETURN: sorted header array 
+	#
+	
+	sub diagHeaderSorter
+	{
+		my %header = % { $_[0] }; 
+		
+		my @sortedHeader;
+		push @sortedHeader, "TT";
+		foreach my $column (sort {lc $b cmp lc $a} keys %header)
+		{
+			push @sortedHeader, $column;
+		}
+		return @sortedHeader;
 	}
 	#######
 	
@@ -2456,7 +2512,6 @@ while (my $inputfile = readdir(DIR))
 			}
 		}
 		
-		print $ooo ",".$savings{"elec"}.",".$savings{"active"}."\n";
 		return %savings;
 	}
 
@@ -2715,87 +2770,6 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
-		
-	
-		my %active = (
-			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
-			"SCH" => ( looks_like_number($SCH[$i]) > 0),
-			"SFS" => ( looks_like_number(&FanOn($i)) > 0),
-			"CFM" => ( looks_like_number($CFM) > 0),
-			"MADta" => ( looks_like_number($MADta[$i]) > 0),
-			"MADtb" => ( looks_like_number($MADtb[$i]) > 0),
-			"OADta" => ( looks_like_number($OADta[$i]) > 0),
-			"OADtb" => ( looks_like_number($OADtb[$i]) > 0),
-			"OAD" => ( looks_like_number($OAD[$i]) > 0),
-			"MAD" => ( looks_like_number($MAD[$i]) > 0),
-		);
-		
-		foreach my $key (keys %active)
-		{
-			unless ($active{$key})	#if any are false
-			{
-				return %savings;
-			}
-		}
-		my @fatalPath;
-		foreach my $lists ($AHUmap->getpaths)
-		{
-			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
-			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
-			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
-			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
-			my @fatalValve;
-			foreach my $valve (@{$lists})
-			{
-				if($valve =~ m/D/) {next;}
-				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
-				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
-				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
-				{
-					push @fatalValve, 1;	#if these are all fatal, then path is fatal
-				}
-				else
-				{
-					push @fatalValve, 0;
-				}
-			}
-			my $fatalvFailure = 0;
-			foreach my $fatal (@fatalValve)
-			{
-				$fatalvFailure += $fatal;
-			}
-			if($fatalvFailure == scalar(@fatalValve))	#only if all valve paths were fatal
-			{
-				push @fatalPath, 1;
-			}
-			else
-			{
-				push @fatalPath, 0;
-			}
-		}
-		my $fatalpFailure = 0;
-		foreach my $fatal (@fatalPath)
-		{
-			$fatalpFailure += $fatal;
-		}
-		
-		if($fatalpFailure == scalar(@fatalPath))
-		{
-			return %savings;
-		}
-
-		foreach my $key (keys(%active))
-		{
-			$savings{"active"} += $active{$key};
-		}
-
-		$savings{"active"} = $savings{"active"}/(scalar (keys(%active)));
 
 		if( ((scalar $AHUmap->getSF) > 0)&&@SCH&&@MADtb&&@MADta&&looks_like_number($CFM)&&looks_like_number(&FanOn($i))&&looks_like_number($SCH[$i])&&(&FanOn($i))&&($SCH[$i]) )	
 		{
@@ -3319,18 +3293,28 @@ while (my $inputfile = readdir(DIR))
 					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Cooling Capacity/) 
 					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature Less/ ) )  ) #if it is DATDEV Cooling event
 					{
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
-						#print "|";
-						print "fudge\n";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
 						my $translationHashRef = &sandwichSensorFudger();
 						
-						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
 						{
-							#print $AHU{"TT"}[$i]."|";
-							my %active = activeCheckForDATDev($i);
+							print $diagDATDev $column.",";
+						}
+						print $diagDATDev "\n";
+						###########diag file header generation/printing############
+						
+						for(my $i = $ticketIndex; $i <= &timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
+						{
+							my %active = &activeCheckForDATDev($i);
+							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
@@ -3383,13 +3367,24 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
-						#print "|";
 						
 						my $translationHashRef = &sandwichSensorFudger();
+						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagDATDev $column.",";
+						}
+						print $diagDATDev "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print $AHU{"TT"}[$i]."|";
 							my %active = activeCheckForDATDev($i);
+							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
@@ -3406,17 +3401,28 @@ while (my $inputfile = readdir(DIR))
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Overage Running Hours/)
 					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
-						print $ooo $AHUname."\n";
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
 						my $translationHashRef = &sandwichSensorFudger();
+						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForOutOfOcc(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagOutOfOcc $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagOutOfOcc $column.",";
+						}
+						print $diagOutOfOcc "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print $AHU{"TT"}[$i]."|";
 							my %active = activeCheckForOutOfOcc($i);
+							print $diagOutOfOcc &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
@@ -3447,11 +3453,21 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
 						###Weekly Treatment Code###
 						
-						#print "|";
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagLeakyStuckDamper $column.",";
+						}
+						print $diagLeakyStuckDamper "\n";
+						###########diag file header generation/printing############
+
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
-							#print $AHU{"TT"}[$i]."|";
 							my %active = activeCheckForLeakyStuckDamper($i);
+							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &LeakyDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
@@ -3481,9 +3497,21 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
 						###Weekly Treatment Code###
 						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagLeakyStuckDamper $column.",";
+						}
+						print $diagLeakyStuckDamper "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
+							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &StuckDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
@@ -3508,9 +3536,21 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForDSPDev(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagDSPDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagDSPDev $column.",";
+						}
+						print $diagDSPDev "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForDSPDev($i);
+							print $diagDSPDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &DSPDev($i, &REALLYMakeVFD($i, $MaxCFM));
@@ -3530,10 +3570,22 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} = 0;	#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
-
+						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForSimHC(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagSimHC $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagSimHC $column.",";
+						}
+						print $diagSimHC "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForSimHC($i);
+							print $diagSimHC &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &SimHC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
@@ -3564,9 +3616,21 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
 						###Weekly Treatment Code###
 						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForLeakyValve(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagLeakyValve $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagLeakyValve $column.",";
+						}
+						print $diagLeakyValve "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyValve($i);
+							print $diagLeakyValve &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
@@ -3733,16 +3797,29 @@ while (my $inputfile = readdir(DIR))
 					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Cooling Capacity/) 
 					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Cooling event
 					{
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
 						my $translationHashRef = &sandwichSensorFudger();
+						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagDATDev $column.",";
+						}
+						print $diagDATDev "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %active = activeCheckForDATDev($i);
+							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
@@ -3762,14 +3839,28 @@ while (my $inputfile = readdir(DIR))
 					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU Heating Capacity/)
 					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Supply Air Temperature/ ) )  ) #if it is DATDEV Heating event
 					{
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						my $translationHashRef = &sandwichSensorFudger();
+						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagDATDev $column.",";
+						}
+						print $diagDATDev "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForDATDev($i);
+							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
@@ -3778,6 +3869,7 @@ while (my $inputfile = readdir(DIR))
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
 						}
+						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"DATDevH"};
 						print "impact days are $impday\n";
 						$newAnom = "DAT Deviation"; 
@@ -3810,7 +3902,6 @@ while (my $inputfile = readdir(DIR))
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Overage Running Hours/)
 					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
 					{
-						print $ooo $AHUname."\n";
 						
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
@@ -3818,10 +3909,22 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
 						my $translationHashRef = &sandwichSensorFudger();
-						#print "|";
+						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForOutOfOcc(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagOutOfOcc $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagOutOfOcc $column.",";
+						}
+						print $diagOutOfOcc "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForOutOfOcc($i);
+							print $diagOutOfOcc &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
@@ -3854,10 +3957,21 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
 						###Weekly Treatment Code###
 							
-						#print "|";
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagLeakyStuckDamper $column.",";
+						}
+						print $diagLeakyStuckDamper "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
+							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &LeakyDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
@@ -3889,9 +4003,21 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
 						###Weekly Treatment Code###
 						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagLeakyStuckDamper $column.",";
+						}
+						print $diagLeakyStuckDamper "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
+							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &StuckDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
@@ -3916,9 +4042,21 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForDSPDev(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagDSPDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagDSPDev $column.",";
+						}
+						print $diagDSPDev "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForDSPDev($i);
+							print $diagDSPDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &DSPDev($i, &REALLYMakeVFD($i, $MaxCFM));
@@ -3936,14 +4074,26 @@ while (my $inputfile = readdir(DIR))
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Simultaneous Heat/) ) #
 					{
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
-						#print "|";
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} = 0;	#fofake.
+						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
+						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForSimHC(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagSimHC $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagSimHC $column.",";
+						}
+						print $diagSimHC "\n";
+						###########diag file header generation/printing############
+						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForSimHC($i);
+							print $diagSimHC &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &SimHC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
@@ -3972,10 +4122,22 @@ while (my $inputfile = readdir(DIR))
 						$bobmarley = timeIndex(${$AHU{"TT"}}[-1], $timeStart);
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"RealActiveStamps"} = $bobmarley + 1;
 						###Weekly Treatment Code###
+						
+						###########diag file header generation/printing############
+						my %activeCheck = &activeCheckForLeakyValve(0);	#TODO: Find a way not to waste a hash doing...
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						print $diagLeakyValve $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
+						foreach my $column (@header)
+						{
+							print $diagLeakyValve $column.",";
+						}
+						print $diagLeakyValve "\n";
+						###########diag file header generation/printing############
 
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyValve($i);
+							print $diagLeakyValve &diagFileTranslator($i, $active{"activePercentage"}, \@header);
 							unless ( $active{"activePercentage"} ) {next;}
 							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
