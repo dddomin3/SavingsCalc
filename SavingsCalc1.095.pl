@@ -4,7 +4,7 @@
 #TODO: Refactor: Throw all the point info (including global!) into the AHU object. MAKE THE AHU OBJECT EAT THE ENTIRE CODE
 
 open(my $dbg, '>', 'dbg.txt') or die "Could not open file";	#for dumpers since DateTime is fucking annoying, goddamn
-open(my $ft, '>', 'HistoryConsole_save.pl');
+open(my $diagTicket_save, '>', 'diagTicket_save.csv');
 open(my $diagOutOfOcc, '>', 'diagOutOfOcc_save.csv');
 open(my $diagSimHC, '>', 'diagSimHC_save.csv');
 open(my $diagLeakyStuckDamper, '>', 'diagLeakyStuckDamper_save.csv');
@@ -615,7 +615,7 @@ if (-e "HistoryConsole.csv")
 		}
 	}
 	$ticket = \%rutgers;
-	#print $ft Dumper \%rutgers; #same shit
+	#print $diagTicket_save Dumper \%rutgers; #same shit
 	
 	close $fh;
 	close $ff;
@@ -3215,7 +3215,7 @@ while (my $inputfile = readdir(DIR))
 	#print @yearss, " is years\n";
 	
 	
-	foreach my $ticketLevel (keys %{${$ticket}{$sitename}{$AHUname}})	#this gets each ticket from the current $AHUname
+	foreach my $ticketLevel (keys %{$ticket->{$sitename}->{$AHUname}})	#this gets each ticket from the current $AHUname
 	{
 		$ticketsum += 1; #work order counter.
 		#unless ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Return Status"} eq "Good Feedback") || ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Return Status"} eq "Bad Feedback Valid") ) { next; } 	#makes sure return status is gucci
@@ -3757,7 +3757,7 @@ while (my $inputfile = readdir(DIR))
 							$equip{"Other Equipment"}{"Tickets"} += 1;
 						}
 						$AnnSumo += $AnnSum;
-						print "${$ticket}{$sitename}{$AHUname}{$ticketLevel} savings is $AnnSum\n";
+						print "$ticket->{$sitename}->{$AHUname}->{$ticketLevel} savings is $AnnSum\n";
 						
 					}
 					else #for tickets with no quantifying savings
@@ -4260,7 +4260,7 @@ while (my $inputfile = readdir(DIR))
 							$equip{"Other Equipment"}{"Tickets"} += 1;
 						}
 						$AnnSumo += $AnnSum;
-						print "${$ticket}{$sitename}{$AHUname}{$ticketLevel} savings is $AnnSum\n";
+						print "$ticket->{$sitename}->{$AHUname}->{$ticketLevel} savings is $AnnSum\n";
 						##################################################################################
 						##################################################################################
 					}
@@ -4834,8 +4834,31 @@ close(NAME);
 	# }
 	# print TOT "\n";
 # }
+###########diag file header generation/printing############
 
-print $ft Dumper \%{$ticket}; #print the hash using the reference hash
+foreach my $AHUname ( keys %{ ${$ticket}{$sitename} } )
+{
+	foreach my $ticketLevel ( keys %{ $ticket->{$sitename}->{$AHUname} } )
+	{
+		my @header = &diagHeaderSorter( $ticket->{$sitename}->{$AHUname}->{$ticketLevel} );	
+		shift @header; #gets rid of "TT"
+		print $diagTicket_save "TicketID,Sitename,Asset Name,";
+		foreach my $column (@header)
+		{
+			print $diagTicket_save $column.",";
+		}
+		
+		print $diagTicket_save "\n";
+		print $diagTicket_save $ticketLevel.",".$sitename.",".$AHUname.",";
+		foreach my $parameter (@header)
+		{
+			print $diagTicket_save $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{$parameter}.",";
+		}
+		print $diagTicket_save "\n\n";
+	}
+}
+###########diag file header generation/printing############
+#print $diagTicket_save Dumper \%{$ticket}; #print the hash using the reference hash
 
 #print Dumper \%latestAnnul;
 print Dumper \%monthlyTicketCounts;
@@ -4845,4 +4868,4 @@ print Dumper \%ahuhash;
 
 #close (TOT);
 close($dbg);
-close($ft);
+close($diagTicket_save);
