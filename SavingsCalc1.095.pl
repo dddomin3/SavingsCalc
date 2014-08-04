@@ -4815,9 +4815,9 @@ close(NAME);
 
 ###########diag file header generation/printing############
 
-foreach my $AHUname ( keys %{ ${$ticket}{$sitename} } )
+foreach my $AHUname ( sort {lc $a cmp lc $b} keys %{ ${$ticket}{$sitename} } )
 {
-	foreach my $ticketLevel ( keys %{ $ticket->{$sitename}->{$AHUname} } )
+	foreach my $ticketLevel ( sort {lc $a cmp lc $b} keys %{ $ticket->{$sitename}->{$AHUname} } )
 	{
 		my @header = &diagHeaderSorter( $ticket->{$sitename}->{$AHUname}->{$ticketLevel} );	
 		shift @header; #gets rid of "TT"
