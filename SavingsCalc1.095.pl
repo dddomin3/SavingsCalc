@@ -1374,7 +1374,7 @@ while (my $inputfile = readdir(DIR))
 		our $MADta = $AHUinfo{$sitename}{$AHUname}{"MADta"};
 	
 		
-	foreach my $name (keys(%AHU))
+	foreach my $name ( sort {lc $a cmp lc $b} keys(%AHU) )
 	{   
 		if($name =~ m/^(CCV|PHV|RHV)(\d)*$/)
 		{
@@ -3213,7 +3213,7 @@ while (my $inputfile = readdir(DIR))
 	#print @yearss, " is years\n";
 	
 	
-	foreach my $ticketLevel (keys %{$ticket->{$sitename}->{$AHUname}})	#this gets each ticket from the current $AHUname
+	foreach my $ticketLevel ( sort {lc $a cmp lc $b} keys %{$ticket->{$sitename}->{$AHUname}} )	#this gets each ticket from the current $AHUname
 	{
 		$ticketsum += 1; #work order counter.
 		#unless ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Return Status"} eq "Good Feedback") || ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Return Status"} eq "Bad Feedback Valid") ) { next; } 	#makes sure return status is gucci
@@ -3754,7 +3754,7 @@ while (my $inputfile = readdir(DIR))
 							$equip{"Other Equipment"}{"Tickets"} += 1;
 						}
 						$AnnSumo += $AnnSum;
-						print "$ticket->{$sitename}->{$AHUname}->{$ticketLevel} savings is $AnnSum\n";
+						print "$ticketLevel savings is $AnnSum\n";
 						
 					}
 					else #for tickets with no quantifying savings
@@ -4257,7 +4257,7 @@ while (my $inputfile = readdir(DIR))
 							$equip{"Other Equipment"}{"Tickets"} += 1;
 						}
 						$AnnSumo += $AnnSum;
-						print "$ticket->{$sitename}->{$AHUname}->{$ticketLevel} savings is $AnnSum\n";
+						print "$ticketLevel savings is $AnnSum\n";
 						##################################################################################
 						##################################################################################
 					}
@@ -4327,10 +4327,10 @@ while (my $inputfile = readdir(DIR))
 		$monthlyTicketCounts{$whythefuckisthiseveryloop}{"OutstandingValue"} = 0;
 	}
 	
-	foreach my $AHUnamean (keys %latestAnnul)
+	foreach my $AHUnamean ( sort {lc $a cmp lc $b} keys %latestAnnul )
 	{
 		print "AHUnamean is $AHUnamean \n";
-		foreach my $annaMolly (keys %{$latestAnnul{$AHUnamean}})
+		foreach my $annaMolly ( sort {lc $a cmp lc $b} keys %{$latestAnnul{$AHUnamean}} )
 		{
 			my $prevDeath = "NULL";
 			foreach my $TickID (sort { $latestAnnul{$AHUnamean}{$annaMolly}{$b}{"TicketAge"} <=> $latestAnnul{$AHUnamean}{$annaMolly}{$a}{"TicketAge"} } keys %{$latestAnnul{$AHUnamean}{$annaMolly}})
@@ -4800,12 +4800,12 @@ print "\t\t+-------------------------------------------------+\n\n\t\t\t       P
 
 #pointnames.csv updating code
 open (NAME, ">", "pointnames.csv") or die $!;
-foreach my $SITE (keys (%stdname))
+foreach my $SITE ( sort {lc $a cmp lc $b} keys (%stdname) )
 {
-	foreach my $UnitName (keys %{$stdname{$SITE}}) #for every AHU.
+	foreach my $UnitName ( sort {lc $a cmp lc $b} keys %{$stdname{$SITE}} ) #for every AHU.
 	#This loop prints out new/appended/reorganized pointnames.csv
 	{
-		foreach my $PointName (keys %{$stdname{$SITE}{$UnitName}}) #for every point per AHU
+		foreach my $PointName ( sort {lc $a cmp lc $b} keys %{$stdname{$SITE}{$UnitName}} ) #for every point per AHU
 		{
 			print NAME "$SITE,$UnitName,$PointName,$stdname{$SITE}{$UnitName}{$PointName},\n";
 		}
