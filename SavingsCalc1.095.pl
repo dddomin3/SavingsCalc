@@ -4469,7 +4469,7 @@ while (my $inputfile = readdir(DIR))
 	
 		if ($x==2)
 		{
-			foreach my $level (keys(%equip))
+			foreach my $level ( sort {lc $a cmp lc $b} keys(%equip) )
 			{
 				print $TreeEquip ($level,",");
 				print $TreeEquip ($equip{$level}{'Tickets'},",");
@@ -4488,7 +4488,7 @@ while (my $inputfile = readdir(DIR))
 	
 		if ($x==2)
 		{
-			foreach my $level (keys(%ahuhash))
+			foreach my $level ( sort {lc $a cmp lc $b}keys(%ahuhash) )
 			{
 				print $TreeAHU ($level,",");
 				print $TreeAHU ($ahuhash{$level}{'Tickets'},",");
@@ -4507,7 +4507,7 @@ while (my $inputfile = readdir(DIR))
 	
 		if ($x==2)
 		{
-			foreach my $level (keys(%alg))
+			foreach my $level ( sort {lc $a cmp lc $b} keys(%alg) )
 			{
 				print $TreeAlg ($level,",");
 				print $TreeAlg ($alg{$level}{'Tickets'},",");
