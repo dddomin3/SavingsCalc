@@ -2060,7 +2060,6 @@ while (my $inputfile = readdir(DIR))
 			elsif (exists $global{$point}) { $returnString .= $global{$point}[$i].","; }
 			else { die $point; }
 		}
-		$returnString .= "\n";
 		return $returnString;
 	}
 	
@@ -3308,19 +3307,19 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagDATDev $column.",";
 						}
-						print $diagDATDev "\n";
-						###########diag file header generation/printing############
+						print $diagDATDev "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; $i <= &timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = &activeCheckForDATDev($i);
 							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							print $diagDATDev $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						
@@ -3378,19 +3377,19 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagDATDev $column.",";
 						}
-						print $diagDATDev "\n";
-						###########diag file header generation/printing############
+						print $diagDATDev "Realized Savings elec,Realized Savings gas,Realized Savings steam,Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForDATDev($i);
 							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;}
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};		
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"}; 
+							print $diagDATDev $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"DATDevH"};
@@ -3416,20 +3415,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagOutOfOcc $column.",";
 						}
-						print $diagOutOfOcc "\n";
-						###########diag file header generation/printing############
+						print $diagOutOfOcc "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForOutOfOcc($i);
 							print $diagOutOfOcc &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagOutOfOcc "0,0,0,\n"; next;}
 							
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"}; 
+							print $diagOutOfOcc $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						
@@ -3461,20 +3460,19 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagLeakyStuckDamper $column.",";
 						}
-						print $diagLeakyStuckDamper "\n";
-						###########diag file header generation/printing############
+						print $diagLeakyStuckDamper "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
 							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;}
 							
 							my %datsave = &LeakyDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"}; print $diagLeakyStuckDamper $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"LeakyDamp"};
@@ -3505,20 +3503,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagLeakyStuckDamper $column.",";
 						}
-						print $diagLeakyStuckDamper "\n";
-						###########diag file header generation/printing############
+						print $diagLeakyStuckDamper "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
 							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;}
 							
 							my %datsave = &StuckDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							print $diagLeakyStuckDamper $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						
@@ -3544,20 +3542,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagDSPDev $column.",";
 						}
-						print $diagDSPDev "\n";
-						###########diag file header generation/printing############
+						print $diagDSPDev "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForDSPDev($i);
 							print $diagDSPDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagDSPDev "0,0,0,\n"; next;}
 							
 							my %datsave = &DSPDev($i, &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							print $diagDSPDev $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						$impday = $annualize{$sitename}{"DSPDev"};
 						print "impact days are $impday\n";
@@ -3579,20 +3577,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagSimHC $column.",";
 						}
-						print $diagSimHC "\n";
-						###########diag file header generation/printing############
+						print $diagSimHC "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForSimHC($i);
 							print $diagSimHC &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagSimHC "0,0,0,\n"; next;}
 							
 							my %datsave = &SimHC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							print $diagSimHC $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						print "Gas savings in kWh is ";
 						print $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"};
@@ -3624,20 +3622,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagLeakyValve $column.",";
 						}
-						print $diagLeakyValve "\n";
-						###########diag file header generation/printing############
+						print $diagLeakyValve "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyValve($i);
 							print $diagLeakyValve &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyValve "0,0,0,\n"; next;}
 							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							print $diagLeakyValve $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						$impday = $annualize{$sitename}{"LeakyVlv"};
 						print "impact days are $impday\n";
@@ -3812,20 +3810,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagDATDev $column.",";
 						}
-						print $diagDATDev "\n";
-						###########diag file header generation/printing############
+						print $diagDATDev "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							#print $AHU{"TT"}[$i]."|";
 							my %active = activeCheckForDATDev($i);
 							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;}
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							print $diagDATDev $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"DATDevC"};
@@ -3854,20 +3852,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagDATDev $column.",";
 						}
-						print $diagDATDev "\n";
-						###########diag file header generation/printing############
+						print $diagDATDev "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForDATDev($i);
 							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;}
 							
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							print $diagDATDev $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"DATDevH"};
@@ -3918,20 +3916,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagOutOfOcc $column.",";
 						}
-						print $diagOutOfOcc "\n";
-						###########diag file header generation/printing############
+						print $diagOutOfOcc "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForOutOfOcc($i);
 							print $diagOutOfOcc &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagOutOfOcc "0,0,0,\n"; next;}
 							
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"}; 
+							print $diagOutOfOcc $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						$impday = $annualize{$sitename}{"OutofOcc"};
@@ -3965,20 +3963,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagLeakyStuckDamper $column.",";
 						}
-						print $diagLeakyStuckDamper "\n";
-						###########diag file header generation/printing############
+						print $diagLeakyStuckDamper "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
 							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;}
 							
 							my %datsave = &LeakyDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"}; 
+							print $diagLeakyStuckDamper $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						
@@ -4011,20 +4009,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagLeakyStuckDamper $column.",";
 						}
-						print $diagLeakyStuckDamper "\n";
-						###########diag file header generation/printing############
+						print $diagLeakyStuckDamper "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
 							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;}
 							
 							my %datsave = &StuckDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"}; 
+							print $diagLeakyStuckDamper $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						&sandwichSensorUnfudger($translationHashRef);
 						
@@ -4050,20 +4048,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagDSPDev $column.",";
 						}
-						print $diagDSPDev "\n";
-						###########diag file header generation/printing############
+						print $diagDSPDev "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForDSPDev($i);
 							print $diagDSPDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagDSPDev "0,0,0,\n"; next;}
 							
 							my %datsave = &DSPDev($i, &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							print $diagDSPDev $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						$impday = $annualize{$sitename}{"DSPDev"};
 						print "impact days are $impday\n";
@@ -4087,20 +4085,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagSimHC $column.",";
 						}
-						print $diagSimHC "\n";
-						###########diag file header generation/printing############
+						print $diagSimHC "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 						
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForSimHC($i);
 							print $diagSimHC &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagSimHC "0,0,0,\n"; next;}
 							
 							my %datsave = &SimHC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"}; 
+							print $diagSimHC $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 
 						$impday = $annualize{$sitename}{"SimHC"};
@@ -4131,20 +4129,20 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagLeakyValve $column.",";
 						}
-						print $diagLeakyValve "\n";
-						###########diag file header generation/printing############
+						print $diagLeakyValve "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
 
 						for(my $i = $ticketIndex; (($i < scalar (@{$AHU{"TT"}}))&&($i < scalar (@OAT))); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
 							my %active = activeCheckForLeakyValve($i);
 							print $diagLeakyValve &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyValve "0,0,0,\n"; next;}
 							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings steam"} += $datsave{"steam"};
-							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"};
+							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} += $active{"activePercentage"}; 
+							print $diagLeakyValve $datsave{"elec"}.",".$datsave{"gas"}.",".$datsave{"steam"}.",\n";
 						}
 						$impday = $annualize{$sitename}{"LeakyVlv"};
 						print "impact days are $impday\n";
