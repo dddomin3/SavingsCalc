@@ -3,7 +3,6 @@
 #TODO: Refactor: Throw all AHUinfo.csv into the AHU object. MAKE THE AHU OBJECT EAT THE ENTIRE CODE
 #TODO: Refactor: Throw all the point info (including global!) into the AHU object. MAKE THE AHU OBJECT EAT THE ENTIRE CODE
 
-open(my $dbg, '>', 'dbg.txt') or die "Could not open file";	#for dumpers since DateTime is fucking annoying, goddamn
 open(my $diagTicket_save, '>', 'diagTicket_save.csv');
 open(my $diagOutOfOcc, '>', 'diagOutOfOcc_save.csv');
 open(my $diagSimHC, '>', 'diagSimHC_save.csv');
@@ -4814,24 +4813,6 @@ foreach my $SITE (keys (%stdname))
 }
 close(NAME);
 
-# open (TOT, ">" ,"totalsavings_save.csv") or die $!;
-# #totalsavings_save.csv creation
-# print TOT "Site,Unit,";
-# foreach my $key (@savingskey)
-# {
-	# print TOT "$key,";
-# }
-# print TOT "\n";
-# foreach my $AHUname (keys %{$savingstot{$sitename}}) #for every AHU in the site
-# #This loop prints out savings
-# {
-	# print TOT "$sitename,$AHUname,";
-	# foreach my $key (@savingskey)
-	# {
-		# print TOT "$savingstot{$sitename}{$AHUname}{$key},";
-	# }
-	# print TOT "\n";
-# }
 ###########diag file header generation/printing############
 
 foreach my $AHUname ( keys %{ ${$ticket}{$sitename} } )
@@ -4856,7 +4837,6 @@ foreach my $AHUname ( keys %{ ${$ticket}{$sitename} } )
 	}
 }
 ###########diag file header generation/printing############
-#print $diagTicket_save Dumper \%{$ticket}; #print the hash using the reference hash
 
 #print Dumper \%latestAnnul;
 print Dumper \%monthlyTicketCounts;
@@ -4864,6 +4844,4 @@ print Dumper \%alg;
 print Dumper \%equip;
 print Dumper \%ahuhash;
 
-#close (TOT);
-close($dbg);
 close($diagTicket_save);
