@@ -1850,7 +1850,10 @@ while (my $inputfile = readdir(DIR))
 			}
 		}
 		
-		$active{"RAT"} = looks_like_number($RAT[$i]) > 0;	#RAT
+		if( (exists $AHU{"RAT"})||(exists $global{"RAT"}) )
+		{
+			$active{"RAT"} = looks_like_number($RAT[$i]) > 0;	#RAT
+		}
 		
 		my @fatalPath;
 		foreach my $lists ($AHUmap->getpaths)
