@@ -2477,7 +2477,7 @@ while (my $inputfile = readdir(DIR))
 
 		if( @SCH&& ((scalar $AHUmap->getSF) > 0) )
 		{
-			if( ( looks_like_number($SCH[$i]) )&&( looks_like_number(&FanOn($i)) )&&(&FanOn($i))&&!($SCH[$i])&&( looks_like_number($CFM) ) )
+			if( ( looks_like_number($SCH[$i]) )&&( looks_like_number(&FanOn($i)) )&&(&FanOn($i))&&!($SCH[$i])&&( looks_like_number($CFM) ) )	#valve waste
 			{
 				foreach my $PHV ($AHUmap->getPHV)
 				{
@@ -2505,14 +2505,12 @@ while (my $inputfile = readdir(DIR))
 							$savings{$AHUmap->getvenergy($RHV)} += $Konst*$CFM*($AHU{ $AHUmap->getvta($RHV) }[$i] - $AHU{ $AHUmap->getvtb($RHV) }[$i]);
 						}
 				}
-				
-				if( looks_like_number($VFD) )
-				{	
-					$savings{"elec"} += $HP*.25*$kWHP*($VFD*.01)**3;
-				}
+			}
+			if( ( looks_like_number($SCH[$i]) )&&( looks_like_number(&FanOn($i)) )&&(&FanOn($i))&&!($SCH[$i])&&( looks_like_number($VFD) )&&($VFD > 0) )	#fan waste
+			{
+				$savings{"elec"} += $HP*.25*$kWHP*($VFD*.01)**3;
 			}
 		}
-		
 		return %savings;
 	}
 
@@ -3302,8 +3300,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3315,7 +3313,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = &activeCheckForDATDev($i);
 							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
@@ -3372,8 +3370,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3385,7 +3383,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForDATDev($i);
 							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} += $datsave{"gas"};
@@ -3400,7 +3398,7 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Overage Running Hours/)
-					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
+					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) )
 					{
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
@@ -3410,8 +3408,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForOutOfOcc(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForOutOfOcc(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagOutOfOcc $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3423,7 +3421,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForOutOfOcc($i);
 							print $diagOutOfOcc &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagOutOfOcc "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagOutOfOcc "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
@@ -3438,7 +3436,7 @@ while (my $inputfile = readdir(DIR))
 						print "impact days are $impday\n";
 						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"};
 					}
-					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Leaky Damper/) ) #if it is Overage Running Hours or Out of Occupancy
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Leaky Damper/) )
 					{
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
@@ -3455,8 +3453,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3468,7 +3466,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
 							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &LeakyDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
@@ -3481,7 +3479,7 @@ while (my $inputfile = readdir(DIR))
 						print "impact days are $impday\n";
 						$newAnom = $ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"};
 					}
-					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Stuck Damper/) ) #if it is Overage Running Hours or Out of Occupancy
+					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Stuck Damper/) )
 					{
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
@@ -3498,8 +3496,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3511,7 +3509,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
 							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &StuckDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
@@ -3529,7 +3527,7 @@ while (my $inputfile = readdir(DIR))
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
 					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/) 
-					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  )
 					{
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
@@ -3537,8 +3535,8 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDSPDev(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForDSPDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagDSPDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3550,7 +3548,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForDSPDev($i);
 							print $diagDSPDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagDSPDev "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagDSPDev "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &DSPDev($i, &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
@@ -3572,8 +3570,8 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForSimHC(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForSimHC(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagSimHC $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3585,7 +3583,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForSimHC($i);
 							print $diagSimHC &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagSimHC "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagSimHC "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &SimHC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
@@ -3617,8 +3615,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyValve(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForLeakyValve(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagLeakyValve $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3630,7 +3628,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForLeakyValve($i);
 							print $diagLeakyValve &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagLeakyValve "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyValve "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} += $datsave{"elec"};
@@ -3805,8 +3803,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3819,7 +3817,7 @@ while (my $inputfile = readdir(DIR))
 							#print $AHU{"TT"}[$i]."|";
 							my %active = activeCheckForDATDev($i);
 							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							my %datsave = &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} += $datsave{"gas"};
@@ -3847,8 +3845,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3860,7 +3858,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForDATDev($i);
 							print $diagDATDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagDATDev "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
@@ -3900,7 +3898,7 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} = $newAnom;
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Overage Running Hours/)
-					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) ) #if it is Overage Running Hours or Out of Occupancy
+					|| ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/Out of Occupancy/) )
 					{
 						
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
@@ -3911,8 +3909,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForOutOfOcc(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForOutOfOcc(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagOutOfOcc $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3924,7 +3922,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForOutOfOcc($i);
 							print $diagOutOfOcc &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagOutOfOcc "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagOutOfOcc "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &OutofOcc($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM), &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
@@ -3958,8 +3956,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 							
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3971,7 +3969,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
 							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &LeakyDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
@@ -4004,8 +4002,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4017,7 +4015,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForLeakyStuckDamper($i);
 							print $diagLeakyStuckDamper &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyStuckDamper "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &StuckDamper($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
@@ -4035,7 +4033,7 @@ while (my $inputfile = readdir(DIR))
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
 					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/) 
-					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  ) #if it is Overage Running Hours or Out of Occupancy
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  )
 					{
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
@@ -4043,8 +4041,8 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDSPDev(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForDSPDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagDSPDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4056,7 +4054,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForDSPDev($i);
 							print $diagDSPDev &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagDSPDev "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagDSPDev "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &DSPDev($i, &REALLYMakeVFD($i, $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
@@ -4080,8 +4078,8 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForSimHC(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForSimHC(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagSimHC $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4093,7 +4091,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForSimHC($i);
 							print $diagSimHC &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagSimHC "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagSimHC "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &SimHC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
@@ -4124,8 +4122,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyValve(0);	#TODO: Find a way not to waste a hash doing...
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things
+						my %activeCheck = &activeCheckForLeakyValve(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
+						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
 						print $diagLeakyValve $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4137,7 +4135,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							my %active = activeCheckForLeakyValve($i);
 							print $diagLeakyValve &diagFileTranslator($i, $active{"activePercentage"}, \@header);
-							unless ( $active{"activePercentage"} ) {print $diagLeakyValve "0,0,0,\n"; next;}
+							unless ( $active{"activePercentage"} ) {print $diagLeakyValve "0,0,0,\n"; next;} #if calcs cannot be done, print 0 for savings on diag file and skip to next timestamp
 							
 							my %datsave = &LeakyVlv($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM),), $MaxCFM));
 							$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} += $datsave{"elec"};
@@ -4566,7 +4564,6 @@ while (my $inputfile = readdir(DIR))
 	print Dumper \%hashahu; #new hash with top 8 assets.
 	
 	#TOP 8 ALGORITHMS!
-	#DOES NOT WORK, JOE
 	my %algvalue; #directly store "AnomalyType => Value"
 	foreach my $wi (keys %alg) #Will create a new, single level hash where each key will be the alg/anomaly, and its value will literally be the value (avoidance cost)
 	{
