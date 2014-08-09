@@ -1635,20 +1635,38 @@ while (my $inputfile = readdir(DIR))
 				$active{"activePercentage"} = 0;
 			}
 		}
-		$active{"VFD"} = ( looks_like_number($VFD) > 0);	#MAT
-		$active{"CFM"} = ( looks_like_number($CFM) > 0);
 		
-		unless ($active{"VFD"}||$active{"CFM"})	#if both are false. DeMorgans ftw
+		if($sitename == "CSQB")	
 		{
-			$active{"activePercentage"} = 0;
+			$active{"VFD"} = ( looks_like_number($VFD) > 0);	#MAT
+			$active{"CoilMeter"} = ( looks_like_number($AHU{"CoilMeter"}) > 0);
+			
+			unless ($active{"VFD"}||$active{"CoilMeter"})	#if both are false. DeMorgans ftw
+			{
+				$active{"activePercentage"} = 0;
+			}
+		}		
+		else
+		{
+			$active{"VFD"} = ( looks_like_number($VFD) > 0);	#MAT
+			$active{"CFM"} = ( looks_like_number($CFM) > 0);
+			
+			unless ($active{"VFD"}||$active{"CFM"})	#if both are false. DeMorgans ftw
+			{
+				$active{"activePercentage"} = 0;
+			}
+		}
+		
+		if(exists $active{"activePercentage"})	#since this will only exist if there has been
+			#a previous required point failure, this will return activePercentage = 0
+			#this ensures this hash will always have all the points the
+			#analytic uses for calculation. Useful for diagnostic output
+		{
+			return %active;  
 		}
 		
 		foreach my $lists ($AHUmap->getpaths)
 		{
-			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
-			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
-			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
-			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
 			foreach my $valve (@{$lists})
 			{
 				if($valve =~ m/D/) {next;}
@@ -1658,13 +1676,6 @@ while (my $inputfile = readdir(DIR))
 			}
 		}
 
-		if(exists $active{"activePercentage"})	#since this will only exist if there has been
-			#a previous required point failure, this will return activePercentage = 0
-			#this ensures this hash will always have all the points the
-			#analytic uses for calculation. Useful for diagnostic output
-		{
-			return %active;
-		}
 		my $activePercentageNumerator = 0;
 		my $activePercentageDenominator = (scalar (keys(%active)));
 		foreach my $key (keys(%active))
@@ -1673,6 +1684,10 @@ while (my $inputfile = readdir(DIR))
 		}
 
 		$active{"activePercentage"} = $activePercentageNumerator/$activePercentageDenominator;
+		if($sitename == "CSQB")
+		{
+			$active{"activePercentage"} = ($active{"VFD"} + $active{"CoilMeter"}) / 2;
+		}
 		return %active;
 	}
 	
@@ -2176,9 +2191,8 @@ while (my $inputfile = readdir(DIR))
 		return;
 	}
 	
-	sub DATDevH #Dennis Approved, OATta -> MAT changes
+	sub DATDevH
 	#DAT Deviation
-	#working
 	#use this: &DATDevH($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM))
 	{
 
@@ -2216,9 +2230,6 @@ while (my $inputfile = readdir(DIR))
 				
 				foreach my $lists ($AHUmap->getpaths)
 				{
-						# print  $AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i];    		#DAT
-						# print  $AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i];   	#DATSP
-						# print  $OADta[$i]; 			#MAT
 																#DAT															#DATSP
 					if ( looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i])&&looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i])
 					&&looks_like_number($MAT[$i]) )
@@ -2317,9 +2328,8 @@ while (my $inputfile = readdir(DIR))
 		return %savings;
 	}
 	
-	sub DATDevC #Dennis Approved, OATta -> MAT changes
+	sub DATDevC
 		#DAT Deviation
-		#working
 		#use this: &DATDevC($i, &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM))
 	{
 		my $i = $_[0];
@@ -2356,10 +2366,6 @@ while (my $inputfile = readdir(DIR))
 
 				foreach my $lists ($AHUmap->getpaths)
 				{
-						# print  $AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i];    		#DAT
-						# print  $AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i];   	#DATSP
-						# print  $OADta[$i]; print "\n";			#MAT
-						# print $MAT[$i]; print "\n";	
 												#DAT															#DATSP
 					if ( looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i])&&looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i])
 					&&looks_like_number($MAT[$i]) )
@@ -2479,31 +2485,42 @@ while (my $inputfile = readdir(DIR))
 		{
 			if( ( looks_like_number($SCH[$i]) )&&( looks_like_number(&FanOn($i)) )&&(&FanOn($i))&&!($SCH[$i])&&( looks_like_number($CFM) ) )	#valve waste
 			{
-				foreach my $PHV ($AHUmap->getPHV)
+				if($sitename == "CSQB")
 				{
-					if( looks_like_number($AHU{$PHV}[$i])&&looks_like_number($AHU{ $AHUmap->getvta($PHV) }[$i])&&looks_like_number($AHU{ $AHUmap->getvtb($PHV) }[$i])&&looks_like_number($CFM)
-						&&($AHU{ $AHUmap->getvtb($PHV) }[$i] < $AHU{ $AHUmap->getvta($PHV) }[$i])	) 
+					if(exists($AHU{"CoilMeter"})&&looks_like_number($AHU{"CoilMeter"}[$i]))
+					{
+						$savings{"elec"} += $AHU{"CoilMeter"}[$i];
+					}
+				}
+				else
+				{
+					foreach my $PHV ($AHUmap->getPHV)
+					{
+						if( looks_like_number($AHU{$PHV}[$i])&&looks_like_number($AHU{ $AHUmap->getvta($PHV) }[$i])&&looks_like_number($AHU{ $AHUmap->getvtb($PHV) }[$i])&&looks_like_number($CFM)
+							&&($AHU{ $AHUmap->getvtb($PHV) }[$i] < $AHU{ $AHUmap->getvta($PHV) }[$i])	) 
 						{
 							$savings{$AHUmap->getvenergy($PHV)} += $Konst*$CFM*($AHU{ $AHUmap->getvta($PHV) }[$i] - $AHU{ $AHUmap->getvtb($PHV) }[$i]);
 						}
-				}
-				
-				foreach my $CCV ($AHUmap->getCCV)
-				{
-					if( looks_like_number($AHU{$CCV}[$i])&&looks_like_number($AHU{ $AHUmap->getvta($CCV) }[$i])&&looks_like_number($AHU{ $AHUmap->getvtb($CCV) }[$i])&&looks_like_number($CFM)
-						&&($AHU{ $AHUmap->getvtb($CCV) }[$i] > $AHU{ $AHUmap->getvta($CCV) }[$i])	) 
+					}
+					
+					foreach my $CCV ($AHUmap->getCCV)
+					{
+						if( looks_like_number($AHU{$CCV}[$i])&&looks_like_number($AHU{ $AHUmap->getvta($CCV) }[$i])&&looks_like_number($AHU{ $AHUmap->getvtb($CCV) }[$i])&&looks_like_number($CFM)
+							&&($AHU{ $AHUmap->getvtb($CCV) }[$i] > $AHU{ $AHUmap->getvta($CCV) }[$i])	) 
 						{
 							$savings{$AHUmap->getvenergy($CCV)} += $Konst*$CFM*($AHU{ $AHUmap->getvtb($CCV) }[$i] - $AHU{ $AHUmap->getvta($CCV) }[$i]);
 						}
-				}
+					}
 
-				foreach my $RHV ($AHUmap->getRHV)
-				{
-					if( looks_like_number($AHU{$RHV}[$i])&&looks_like_number($AHU{ $AHUmap->getvta($RHV) }[$i])&&looks_like_number($AHU{ $AHUmap->getvtb($RHV) }[$i])&&looks_like_number($CFM)
-						&&($AHU{ $AHUmap->getvtb($RHV) }[$i] < $AHU{ $AHUmap->getvta($RHV) }[$i])	) 
+					foreach my $RHV ($AHUmap->getRHV)
+					{
+						if( looks_like_number($AHU{$RHV}[$i])&&looks_like_number($AHU{ $AHUmap->getvta($RHV) }[$i])&&looks_like_number($AHU{ $AHUmap->getvtb($RHV) }[$i])&&looks_like_number($CFM)
+							&&($AHU{ $AHUmap->getvtb($RHV) }[$i] < $AHU{ $AHUmap->getvta($RHV) }[$i])	) 
 						{
 							$savings{$AHUmap->getvenergy($RHV)} += $Konst*$CFM*($AHU{ $AHUmap->getvta($RHV) }[$i] - $AHU{ $AHUmap->getvtb($RHV) }[$i]);
 						}
+					
+					}
 				}
 			}
 			if( ( looks_like_number($SCH[$i]) )&&( looks_like_number(&FanOn($i)) )&&(&FanOn($i))&&!($SCH[$i])&&( looks_like_number($VFD) )&&($VFD > 0) )	#fan waste
@@ -3415,7 +3432,7 @@ while (my $inputfile = readdir(DIR))
 						{
 							print $diagOutOfOcc $column.",";
 						}
-						print $diagOutOfOcc "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n";
+						print $diagOutOfOcc "Realized Savings elec,Realized Savings gas,Realized Savings steam,\n"; #jump up jump up and get down.....<- using that to Ctrl+f back here....first thing to pop into my head
 						
 						for(my $i = $ticketIndex; $i <= timeIndex ($timeEnd, $AHU{"TT"}[0]); $i++) #basically do while $i is NOT greater than the position $timeEnd is in, relative to the first timestamp of the AHU data
 						{
