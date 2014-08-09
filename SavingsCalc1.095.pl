@@ -1636,9 +1636,9 @@ while (my $inputfile = readdir(DIR))
 			}
 		}
 		
-		if($sitename == "CSQB")	
+		if($sitename eq "CSQB")	
 		{
-			$active{"VFD"} = ( looks_like_number($VFD) > 0);	#MAT
+			$active{"VFD"} = ( looks_like_number($VFD) > 0);
 			$active{"CoilMeter"} = ( looks_like_number($AHU{"CoilMeter"}) > 0);
 			
 			unless ($active{"VFD"}||$active{"CoilMeter"})	#if both are false. DeMorgans ftw
@@ -1648,7 +1648,7 @@ while (my $inputfile = readdir(DIR))
 		}		
 		else
 		{
-			$active{"VFD"} = ( looks_like_number($VFD) > 0);	#MAT
+			$active{"VFD"} = ( looks_like_number($VFD) > 0);
 			$active{"CFM"} = ( looks_like_number($CFM) > 0);
 			
 			unless ($active{"VFD"}||$active{"CFM"})	#if both are false. DeMorgans ftw
@@ -1684,7 +1684,7 @@ while (my $inputfile = readdir(DIR))
 		}
 
 		$active{"activePercentage"} = $activePercentageNumerator/$activePercentageDenominator;
-		if($sitename == "CSQB")
+		if($sitename eq "CSQB")
 		{
 			$active{"activePercentage"} = ($active{"VFD"} + $active{"CoilMeter"}) / 2;
 		}
@@ -2080,12 +2080,159 @@ while (my $inputfile = readdir(DIR))
 		return $returnString;
 	}
 	
-	# sub diagFileSorter
-	# PURPOSE: sorts the keys of the outputs from activeChecks
-	#			so the diag Files can print correctly
+	# sub diagHeaderGenerator
+	# PURPOSE: Generate a sorted array of the points necessary for Diagnostic Files
+	#			depending on the analytic.
+	#			
 	# INPUTS: 
 	#		PARAMETERS:
-	#			output hash turned into a REFERENCE from activeCheck<Analytic>(0)
+	#			string name of analytic. 
+	#				qw (DAT OutOfOcc LeakyStuckDamper DSPDev SimHC LeakyValve);
+	#		GLOBALS:
+	#			$AHUmap, %AHU
+	#
+	# RETURN: sorted header array 
+	#
+	
+	sub diagHeaderGenerator
+	{
+		my $analyticString = $_[0];
+		my %header = (	#these should be 100% REQUIRED to output for every analytic. 
+						#Using a hash so I don't have to do exist checks every 2 seconds.
+			"SCH" => 1,
+			"SFS" => 1,
+		);
+
+		if( $analyticString eq "DATDev" )
+		{
+			$header{"CFM"} = 1;
+			$header{"MAT"} = 1;
+			foreach my $lists ($AHUmap->getpaths)
+			{
+				$header{$AHUmap->getvta(${$lists}[-1])} = 1;
+				$header{$AHUmap->getvta(${$lists}[-1])."SP"} = 1;
+				foreach my $valve (@{$lists})
+				{
+					$header{$valve} = 1;
+					$header{$AHUmap->getvta($valve)} = 1;
+					$header{$AHUmap->getvtb($valve)} = 1;
+				}
+			}
+		}
+		
+		if( $analyticString eq "OutOfOcc" )
+		{
+			if($sitename eq "CSQB")	
+			{
+				$header{"VFD"} = 1;
+				$header{"CoilMeter"} = 1;
+			}		
+			else
+			{
+				$header{"VFD"} = 1;
+				$header{"CFM"} = 1;
+			}
+			
+			foreach my $lists ($AHUmap->getpaths)
+			{
+				foreach my $valve (@{$lists})
+				{
+					$header{$valve} = 1;
+					$header{$AHUmap->getvta($valve)} = 1;
+					$header{$AHUmap->getvtb($valve)} = 1;
+				}
+			}
+		}
+		
+		if( $analyticString eq "LeakyStuckDamper" )
+		{
+			$header{"MAT"} = 1;
+			$header{"CFM"} = 1;
+			$header{"MADta"} = 1;
+			$header{"MADtb"} = 1;
+			$header{"OADta"} = 1;
+			$header{"OADtb"} = 1;
+			$header{"OAD"} = 1;
+			
+			foreach my $lists ($AHUmap->getpaths)
+			{
+				$header{$AHUmap->getvta(${$lists}[-1])} = 1;
+				$header{$AHUmap->getvta(${$lists}[-1])."SP"} = 1;
+				foreach my $valve (@{$lists})
+				{
+					$header{$valve} = 1;
+					$header{$AHUmap->getvta($valve)} = 1;
+					$header{$AHUmap->getvtb($valve)} = 1;
+				}
+			}
+		}
+	
+		if( $analyticString eq "DSPDev" )
+		{
+			$header{"DSP"} = 1;
+			$header{"DSPSP"} = 1;
+			$header{"DSPdb"} = 1;
+			$header{"VFD"} = 1;
+			$header{"HP"} = 1;
+		}
+		
+		if( $analyticString eq "SimHC" )
+		{
+			$header{"MAT"} = 1;
+			$header{"CFM"} = 1;
+			
+			if( (exists $AHU{"RAT"})||(exists $global{"RAT"}) )
+			{
+				$header{"RAT"} = 1;	
+			}
+			
+			foreach my $lists ($AHUmap->getpaths)
+			{
+				$header{$AHUmap->getvta(${$lists}[-1])} = 1;
+				$header{$AHUmap->getvta(${$lists}[-1])."SP"} = 1;
+				foreach my $valve (@{$lists})
+				{
+					$header{$valve} = 1;
+					$header{$AHUmap->getvta($valve)} = 1;
+					$header{$AHUmap->getvtb($valve)} = 1;
+				}
+			}
+		}
+		
+		if( $analyticString eq "LeakyValve" )
+		{
+			$header{"MAT"} = 1;
+			$header{"CFM"} = 1;
+			
+			foreach my $lists ($AHUmap->getpaths)
+			{
+				$header{$AHUmap->getvta(${$lists}[-1])} = 1;
+				$header{$AHUmap->getvta(${$lists}[-1])."SP"} = 1;
+				foreach my $valve (@{$lists})
+				{
+					$header{$valve} = 1;
+					$header{$AHUmap->getvta($valve)} = 1;
+					$header{$AHUmap->getvtb($valve)} = 1;
+				}
+			}
+		}
+		
+		
+		my @sortedHeader;
+		push @sortedHeader, "TT";
+		foreach my $column (sort {lc $b cmp lc $a} keys %header)
+		{
+			push @sortedHeader, $column;
+		}
+		return @sortedHeader;
+	}
+	
+	# sub diagFileSorter
+	# PURPOSE: sorts the keys of hashes so that they can
+	#			make diag Files print correctly
+	# INPUTS: 
+	#		PARAMETERS:
+	#			output hash turned into a REFERENCE 
 	#		
 	# RETURN: sorted header array 
 	#
@@ -2095,7 +2242,6 @@ while (my $inputfile = readdir(DIR))
 		my %header = % { $_[0] }; 
 		
 		my @sortedHeader;
-		push @sortedHeader, "TT";
 		foreach my $column (sort {lc $b cmp lc $a} keys %header)
 		{
 			push @sortedHeader, $column;
@@ -2485,7 +2631,7 @@ while (my $inputfile = readdir(DIR))
 		{
 			if( ( looks_like_number($SCH[$i]) )&&( looks_like_number(&FanOn($i)) )&&(&FanOn($i))&&!($SCH[$i])&&( looks_like_number($CFM) ) )	#valve waste
 			{
-				if($sitename == "CSQB")
+				if($sitename eq "CSQB")
 				{
 					if(exists($AHU{"CoilMeter"})&&looks_like_number($AHU{"CoilMeter"}[$i]))
 					{
@@ -3317,8 +3463,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("DATDev");	
+						
 						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3387,8 +3533,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("DATDev");	
+						
 						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3425,8 +3571,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForOutOfOcc(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("OutOfOcc");	
+						
 						print $diagOutOfOcc $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3470,8 +3616,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("LeakyStuckDamper");	
+						
 						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3513,8 +3659,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("LeakyStuckDamper");	
+						
 						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3552,8 +3698,8 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDSPDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("DSPDev");	
+						
 						print $diagDSPDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3587,8 +3733,8 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForSimHC(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("SimHC");	
+						
 						print $diagSimHC $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3632,8 +3778,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyValve(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("LeakyValve");	
+						
 						print $diagLeakyValve $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3820,8 +3966,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("DATDev");	
+						
 						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3862,8 +4008,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDATDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("DATDev");	
+						
 						print $diagDATDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3926,8 +4072,8 @@ while (my $inputfile = readdir(DIR))
 						my $translationHashRef = &sandwichSensorFudger();
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForOutOfOcc(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("OutOfOcc");	
+						
 						print $diagOutOfOcc $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -3973,8 +4119,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 							
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("LeakyStuckDamper");	
+						
 						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4019,8 +4165,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyStuckDamper(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("LeakyStuckDamper");	
+						
 						print $diagLeakyStuckDamper $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4058,8 +4204,8 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForDSPDev(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("DSPDev");	
+						
 						print $diagDSPDev $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4095,8 +4241,8 @@ while (my $inputfile = readdir(DIR))
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"CalcActive"} = 0;	#forreal.
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForSimHC(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("SimHC");	
+						
 						print $diagSimHC $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4139,8 +4285,8 @@ while (my $inputfile = readdir(DIR))
 						###Weekly Treatment Code###
 						
 						###########diag file header generation/printing############
-						my %activeCheck = &activeCheckForLeakyValve(0);	#TODO: Find a way not to waste a hash doing... #this grabs the headers from the active check. only keys are useful, so 0 is passed in
-						my @header = &diagHeaderSorter( \%activeCheck );	#these two things #this sorts the header to deal with hashrandomness
+						my @header = &diagHeaderGenerator("LeakyValve");	
+						
 						print $diagLeakyValve $ticketLevel.",".$AHUname.",".$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"}."\n";
 						foreach my $column (@header)
 						{
@@ -4837,7 +4983,6 @@ foreach my $AHUname ( sort {lc $a cmp lc $b} keys %{ ${$ticket}{$sitename} } )
 	foreach my $ticketLevel ( sort {lc $a cmp lc $b} keys %{ $ticket->{$sitename}->{$AHUname} } )
 	{
 		my @header = &diagHeaderSorter( $ticket->{$sitename}->{$AHUname}->{$ticketLevel} );	
-		shift @header; #gets rid of "TT"
 		print $diagTicket_save "TicketID,Sitename,Asset Name,";
 		foreach my $column (@header)
 		{

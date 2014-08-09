@@ -14,7 +14,7 @@ TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Rea
 FKE-0116909,FAKE,AHU1,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,5046,0,0,0,0,0,0,180,NULL,NULL,0,Honeywell found a bad 48,NULL,0,Leaky Valve,0,0,0,0,0,0,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,Potential Savings steam_dollar,Potential Savings steam,Potential Savings gas_dollar,Potential Savings gas,Potential Savings elec_dollar,Potential Savings elec,ImpactDays,EndTime,Effect,Data Reliability,Comments,Cause,CalcActive,Anomaly,Annualized steam savings_dollar,Annualized steam savings,Annualized gas savings_dollar,Annualized gas savings,Annualized elec savings_dollar,Annualized elec savings,
-FKE-0116910,FAKE,AHU1,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,0,0,0,0,10.7137498236363,255.089281515149,90,NULL,NULL,0.900066046842455,Honeywell found a bad 47,NULL,3936.8888888889,Out of Occupancy,0,0,0,0,23.5126774183211,559.825652817169,
+FKE-0116910,FAKE,AHU1,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,0,0,0,0,10.7137498236363,255.089281515149,90,NULL,NULL,0.901548925468679,Honeywell found a bad 47,NULL,3943.375,Out of Occupancy,0,0,0,0,23.4740034808298,558.904844781663,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,EndTime,Effect,Comments,Cause,Anomaly,
 FKE-0116911,FAKE,AHU1,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,NULL,NULL,Honeywell found a bad 46,NULL,Improper Economizing,
@@ -53,7 +53,7 @@ TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Rea
 FKE-0116948,FAKE,AHU1,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,0,0,8013,180,2014-05-16T10:25:19,NULL,0,Honeywell found a bad 9,NULL,0,Leaky Valve,0,0,0,0,0,0,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Realized Savings steam_dollar,Realized Savings steam,Realized Savings gas_dollar,Realized Savings gas,Realized Savings elec_dollar,Realized Savings elec,RealActiveStamps,ImpactDays,EndTime,Effect,Data Reliability,Comments,Cause,CalcActive,Anomaly,Annualized steam savings_dollar,Annualized steam savings,Annualized gas savings_dollar,Annualized gas savings,Annualized elec savings_dollar,Annualized elec savings,
-FKE-0116949,FAKE,AHU1,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,9.33857500327202,222.347023887429,7341,90,2014-05-16T10:25:19,NULL,0.961176951369025,Honeywell found a bad 8,NULL,7056.00000000001,Out of Occupancy,0,0,0,0,11.4349897999249,272.261661902974,
+FKE-0116949,FAKE,AHU1,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,9.33857500327202,222.347023887429,7341,90,2014-05-16T10:25:19,NULL,0.962283748808064,Honeywell found a bad 8,NULL,7064.125,Out of Occupancy,0,0,0,0,11.4218375281114,271.948512574082,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,EndTime,Effect,Comments,Cause,Anomaly,
 FKE-0116950,FAKE,AHU1,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,7341,2014-05-16T10:25:19,NULL,Honeywell found a bad 7,NULL,Improper Economizing,
@@ -92,7 +92,7 @@ TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Rea
 FKE-0116896,FAKE,AHU4,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,5046,0,0,0,0,0,0,180,NULL,NULL,0,Honeywell found a bad 61,NULL,0,Leaky Valve,0,0,0,0,0,0,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,Potential Savings steam_dollar,Potential Savings steam,Potential Savings gas_dollar,Potential Savings gas,Potential Savings elec_dollar,Potential Savings elec,ImpactDays,EndTime,Effect,Data Reliability,Comments,Cause,CalcActive,Anomaly,Annualized steam savings_dollar,Annualized steam savings,Annualized gas savings_dollar,Annualized gas savings,Annualized elec savings_dollar,Annualized elec savings,
-FKE-0116897,FAKE,AHU4,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,0,0,0,0,0,0,90,NULL,NULL,0.851801046588427,Honeywell found a bad 60,NULL,3725.77777777778,Out of Occupancy,0,0,0,0,0,0,
+FKE-0116897,FAKE,AHU4,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,0,0,0,0,0,0,90,NULL,NULL,0.859539323273891,Honeywell found a bad 60,NULL,3759.625,Out of Occupancy,0,0,0,0,0,0,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,EndTime,Effect,Comments,Cause,Anomaly,
 FKE-0116898,FAKE,AHU4,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,NULL,NULL,Honeywell found a bad 59,NULL,Improper Economizing,
@@ -131,7 +131,7 @@ TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Rea
 FKE-0116935,FAKE,AHU4,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,0,0,8013,180,2014-05-16T10:25:19,NULL,0,Honeywell found a bad 22,NULL,0,Leaky Valve,0,0,0,0,0,0,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Realized Savings steam_dollar,Realized Savings steam,Realized Savings gas_dollar,Realized Savings gas,Realized Savings elec_dollar,Realized Savings elec,RealActiveStamps,ImpactDays,EndTime,Effect,Data Reliability,Comments,Cause,CalcActive,Anomaly,Annualized steam savings_dollar,Annualized steam savings,Annualized gas savings_dollar,Annualized gas savings,Annualized elec savings_dollar,Annualized elec savings,
-FKE-0116936,FAKE,AHU4,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,0,0,7341,90,2014-05-16T10:25:19,NULL,0.970197823487566,Honeywell found a bad 21,NULL,7122.22222222222,Out of Occupancy,0,0,0,0,0,0,
+FKE-0116936,FAKE,AHU4,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,0,0,7341,90,2014-05-16T10:25:19,NULL,0.969316169459202,Honeywell found a bad 21,NULL,7115.75,Out of Occupancy,0,0,0,0,0,0,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,EndTime,Effect,Comments,Cause,Anomaly,
 FKE-0116937,FAKE,AHU4,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,7341,2014-05-16T10:25:19,NULL,Honeywell found a bad 20,NULL,Improper Economizing,
@@ -170,7 +170,7 @@ TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Rea
 FKE-0116883,FAKE,AHU5,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,5046,0,0,0,0,434.390511496877,10342.6312261161,180,NULL,NULL,0.743713392345963,Honeywell found a bad 74,NULL,3752.77777777773,Leaky Valve,0,0,0,0,2000.18985486292,47623.5679729266,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,Potential Savings steam_dollar,Potential Savings steam,Potential Savings gas_dollar,Potential Savings gas,Potential Savings elec_dollar,Potential Savings elec,ImpactDays,EndTime,Effect,Data Reliability,Comments,Cause,CalcActive,Anomaly,Annualized steam savings_dollar,Annualized steam savings,Annualized gas savings_dollar,Annualized gas savings,Annualized elec savings_dollar,Annualized elec savings,
-FKE-0116884,FAKE,AHU5,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,0,0,0,0,0,0,90,NULL,NULL,0.842272519433025,Honeywell found a bad 73,NULL,3684.10000000005,Out of Occupancy,0,0,0,0,0,0,
+FKE-0116884,FAKE,AHU5,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,0,0,0,0,0,0,90,NULL,NULL,0.848092262358368,Honeywell found a bad 73,NULL,3709.5555555555,Out of Occupancy,0,0,0,0,0,0,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,EndTime,Effect,Comments,Cause,Anomaly,
 FKE-0116885,FAKE,AHU5,45.5520833333333,Closed,2014-05-16T10:25:19,Analytic,Good Feedback,4374,NULL,NULL,Honeywell found a bad 72,NULL,Improper Economizing,
@@ -209,7 +209,7 @@ TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Rea
 FKE-0116922,FAKE,AHU5,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,3613.51414174601,86036.0509939525,8013,180,2014-05-16T10:25:19,NULL,0.885422299873797,Honeywell found a bad 35,NULL,7094.88888888874,Leaky Valve,0,0,0,0,8800.91645510619,209545.629883481,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,Realized Savings steam_dollar,Realized Savings steam,Realized Savings gas_dollar,Realized Savings gas,Realized Savings elec_dollar,Realized Savings elec,RealActiveStamps,ImpactDays,EndTime,Effect,Data Reliability,Comments,Cause,CalcActive,Anomaly,Annualized steam savings_dollar,Annualized steam savings,Annualized gas savings_dollar,Annualized gas savings,Annualized elec savings_dollar,Annualized elec savings,
-FKE-0116923,FAKE,AHU5,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,0,0,7341,90,2014-05-16T10:25:19,NULL,0.954079825636814,Honeywell found a bad 34,NULL,7003.89999999985,Out of Occupancy,0,0,0,0,0,0,
+FKE-0116923,FAKE,AHU5,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,0,0,0,0,0,0,7341,90,2014-05-16T10:25:19,NULL,0.95150524451707,Honeywell found a bad 34,NULL,6984.99999999981,Out of Occupancy,0,0,0,0,0,0,
 
 TicketID,Sitename,Asset Name,TicketAge,Status,StartTime,Source,Return Status,RealActiveStamps,EndTime,Effect,Comments,Cause,Anomaly,
 FKE-0116924,FAKE,AHU5,122.010416666667,Closed,2014-02-28T22:28:11,Analytic,Good Feedback,7341,2014-05-16T10:25:19,NULL,Honeywell found a bad 33,NULL,Improper Economizing,
