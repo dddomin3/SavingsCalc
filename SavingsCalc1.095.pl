@@ -2051,7 +2051,7 @@ while (my $inputfile = readdir(DIR))
 		my $activePercentage = $_[1];
 		my $header = $_[2];
 		my $CFM = &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM);
-		my $VFD = MakeVFD($i,REALLYMakeVFD($i, $MaxCFM));
+		my $VFD = REALLYMakeVFD($i, $MaxCFM);
 		my $returnString = "";
 		foreach my $point ( @{ $header } )
 		{
@@ -4700,7 +4700,7 @@ while (my $inputfile = readdir(DIR))
 	print Dumper \%ahuvalue;
 	my @ahurow; #array will store top 8 AHUs in order, for reference later (dont need TOTAL avoidable cost, need completed vs outstanding)
 	my $nums = 0;
-	foreach my $name (sort { $ahuvalue{$b} <=> $ahuvalue{$a} } keys %ahuvalue) #sort by highest->lowest
+	foreach my $name (sort { $ahuvalue{$b} <=> $ahuvalue{$a} or $a cmp $b } keys %ahuvalue) #sort by highest->lowest
 	{
 		if ($nums <=7) #only add up to top 8 assets
 		{
@@ -4735,7 +4735,7 @@ while (my $inputfile = readdir(DIR))
 	print Dumper \%algvalue;
 	my @algrow; #array will store top 8 Anomalies in order, for reference later (dont need TOTAL avoidable cost, need completed vs outstanding)
 	my $numso = 0;
-	foreach my $name (sort { $algvalue{$b} <=> $algvalue{$a} } keys %algvalue) #sort by highest->lowest
+	foreach my $name (sort { $algvalue{$b} <=> $algvalue{$a} or $a cmp $b } keys %algvalue) #sort by highest->lowest
 	{
 		if ($numso <=7) #only add up to top 8 assets
 		{
