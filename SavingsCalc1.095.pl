@@ -2692,87 +2692,7 @@ while (my $inputfile = readdir(DIR))
 							'steam' => 0,
 							'active' => 0
 						);
-						
 		
-		
-		my %active = (
-			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
-			"SCH" => ( looks_like_number($SCH[$i]) > 0),
-			"SFS" => ( looks_like_number(&FanOn($i)) > 0),
-			"CFM" => ( looks_like_number($CFM) > 0),
-			"MADta" => ( looks_like_number($MADta[$i]) > 0),
-			"MADtb" => ( looks_like_number($MADtb[$i]) > 0),
-			"OADta" => ( looks_like_number($OADta[$i]) > 0),
-			"OADtb" => ( looks_like_number($OADtb[$i]) > 0),
-			"OAD" => ( looks_like_number($OAD[$i]) > 0),
-		);
-		
-		foreach my $key (keys %active)
-		{
-			unless ($active{$key})	#if any are false
-			{
-				return %savings;
-			}
-		}
-		my @fatalPath;
-		foreach my $lists ($AHUmap->getpaths)
-		{
-			my $sDAT = $AHUmap->getvta(${$lists}[-1]);
-			my $sDATSP = $AHUmap->getvta(${$lists}[-1])."SP";
-			$active{$sDAT} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i]) > 0);
-			$active{$sDATSP} = (looks_like_number($AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i]) > 0); #DATSP
-			unless($active{$sDAT}&&$active{$sDATSP})	#if you're missing either of DAT or DATSP
-			{
-				push @fatalPath, 1;	#if these are all fatal, then analytic is fatal, and returns 0
-				next;	#no point of continuing after this.
-			}
-			my @fatalValve;
-			foreach my $valve (@{$lists})
-			{
-				if($valve =~ m/D/) {next;}
-				$active{$valve} = (looks_like_number($AHU{$valve}[$i]) > 0);
-				$active{$AHUmap->getvta($valve)} = (looks_like_number($AHU{ $AHUmap->getvta($valve) }[$i]) > 0);
-				$active{$AHUmap->getvtb($valve)} = (looks_like_number($AHU{ $AHUmap->getvtb($valve) }[$i]) > 0);
-				unless( $active{$AHUmap->getvta($valve)}&&$active{$AHUmap->getvtb($valve)}&&$active{$valve} )	#if you are missing any one of tb or ta or valve signal
-				{
-					push @fatalValve, 1;	#if these are all fatal, then path is fatal
-				}
-				else
-				{
-					push @fatalValve, 0;
-				}
-			}
-			my $fatalvFailure = 0;
-			foreach my $fatal (@fatalValve)
-			{
-				$fatalvFailure += $fatal;
-			}
-			if($fatalvFailure == scalar(@fatalValve))	#only if all valve paths were fatal
-			{
-				push @fatalPath, 1;
-			}
-			else
-			{
-				push @fatalPath, 0;
-			}
-		}
-		my $fatalpFailure = 0;
-		foreach my $fatal (@fatalPath)
-		{
-			$fatalpFailure += $fatal;
-		}
-		
-		if($fatalpFailure == scalar(@fatalPath))
-		{
-			return %savings;
-		}
-
-		foreach my $key (keys(%active))
-		{
-			$savings{"active"} += $active{$key};
-		}
-
-		$savings{"active"} = $savings{"active"}/(scalar (keys(%active)));
 		if( ((scalar $AHUmap->getSF) > 0)&&@SCH&&@OAD&&@OADtb&&@OADta&&@MADtb&&@MADta&&looks_like_number($CFM)&&looks_like_number(&FanOn($i))&&looks_like_number($SCH[$i])&&(&FanOn($i))&&($SCH[$i]) )	
 		{
 			#You can haz Bucket!!!
@@ -2796,14 +2716,11 @@ while (my $inputfile = readdir(DIR))
 			{																				
 				#stuff to be used later
 				my $MaxWasteH = 0;
-				my $MaxWasteC = 0;				#MATrat($OADtb[$i],$MADtb[$i],$OADmin,$OADmax,$Leaky_Dampdb)  
-				my $MATratEx;# = MATrat($OADtb[$i],$MADtb[$i],$AHUinfo{$sitename}{$AHUname}{"OADminPer"},$AHUinfo{$sitename}{$AHUname}{"OADmaxPer"},$Leaky_Dampdb);
-				my $MAToatEx;# = MAToat($OADtb[$i],$MADtb[$i],$AHUinfo{$sitename}{$AHUname}{"OADminPer"},$AHUinfo{$sitename}{$AHUname}{"OADmaxPer"},$Leaky_Dampdb);	#warning if $OADtb[$i],$MADtb[$i] don't look like numbers
-												#MAToat($OADtb[$i],$MADtb[$i],$OADmin,$OADmax,$Leaky_Dampdb)
-				
+				my $MaxWasteC = 0;			  
+				my $MATratEx;
+				my $MAToatEx;
 			
-				my $OAD = PerFudge($AHUinfo{$sitename}{$AHUname}{"OADminSig"},$AHUinfo{$sitename}{$AHUname}{"OADmaxSig"},$OAD[$i]);         #minSig      $AHU{ $AHUmap->getvminSig(${$lists}[0])  }[$i]
-				
+				my $OAD = PerFudge($AHUinfo{$sitename}{$AHUname}{"OADminSig"},$AHUinfo{$sitename}{$AHUname}{"OADmaxSig"},$OAD[$i]);
 				
 				#is the event happening? if so calc the max possible waste
 				if(looks_like_number($OAD[$i])&&looks_like_number($OADtb[$i])
@@ -2822,10 +2739,6 @@ while (my $inputfile = readdir(DIR))
 					}
 					######################-^^-leaky/Stuck-vv- segregation line#################################################
 				}
-			
-				# print  $AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i];    		#DAT
-				# print  $AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i];   	#DATSP
-				# print  $OADta[$i]; 			#MAT
 
 				if( $MaxWasteH > 0 )
 				{
@@ -2958,13 +2871,12 @@ while (my $inputfile = readdir(DIR))
 			{																				
 				#stuff to be used later
 				my $MaxWasteH = 0;
-				my $MaxWasteC = 0;				#MATrat($OADtb[$i],$MADtb[$i],$OADmin,$OADmax,$Leaky_Dampdb)  
-				my $MATratEx;# = MATrat($OADtb[$i],$MADtb[$i],$AHUinfo{$sitename}{$AHUname}{"OADminPer"},$AHUinfo{$sitename}{$AHUname}{"OADmaxPer"},$Leaky_Dampdb);
-				my $MAToatEx;# = MAToat($OADtb[$i],$MADtb[$i],$AHUinfo{$sitename}{$AHUname}{"OADminPer"},$AHUinfo{$sitename}{$AHUname}{"OADmaxPer"},$Leaky_Dampdb);
-												#MAToat($OADtb[$i],$MADtb[$i],$OADmin,$OADmax,$Leaky_Dampdb)
+				my $MaxWasteC = 0;			
+				my $MATratEx;
+				my $MAToatEx;
 				
 			
-				my $OAD = PerFudge($AHUinfo{$sitename}{$AHUname}{"OADminSig"},$AHUinfo{$sitename}{$AHUname}{"OADmaxSig"},$OAD[$i]);         #minSig      $AHU{ $AHUmap->getvminSig(${$lists}[0])  }[$i]
+				my $OAD = PerFudge($AHUinfo{$sitename}{$AHUname}{"OADminSig"},$AHUinfo{$sitename}{$AHUname}{"OADmaxSig"},$OAD[$i]);         #minSig     
 				
 				
 				#is the event happening? if so calc the max possible waste
@@ -2984,10 +2896,6 @@ while (my $inputfile = readdir(DIR))
 						$MaxWasteC = $OADta[$i] - $MAToatEx;
 					}
 				}
-				
-				# print  $AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i];    		#DAT
-				# print  $AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i];   	#DATSP
-				# print  $OADta[$i]; 			#MAT
 
 				if( $MaxWasteH > 0 )
 				{
@@ -3177,9 +3085,6 @@ while (my $inputfile = readdir(DIR))
 							}	
 						}
 					}
-					# print  $AHU{ $AHUmap->getvta(${$lists}[-1]) }[$i];    		#DAT
-					# print  $AHU{ $AHUmap->getvta(${$lists}[-1])."SP" }[$i];   	#DATSP
-					# print  $OADta[$i]; 			#MAT
 					
 					#################### Above tells if it's hating and cooling ################ Below tells what to do if heating and cooling ##############
 
