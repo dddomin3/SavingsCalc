@@ -2075,6 +2075,7 @@ while (my $inputfile = readdir(DIR))
 			elsif ($point eq "activePercentage") { $returnString .= $activePercentage.","; }
 			elsif (exists $AHU{$point}) { $returnString .= $AHU{$point}[$i].","; }
 			elsif (exists $global{$point}) { $returnString .= $global{$point}[$i].","; }
+			elsif ($point =~ m/NODE/) { $returnString .= "UnableToInterpolate,"; }
 			else { die $point; }
 		}
 		return $returnString;
@@ -4938,10 +4939,13 @@ while (my $inputfile = readdir(DIR))
 	}
 	close (CONV);
 	close ($inz);
+	
+	undef %AHU;
 	for (keys %AHU)	#deletes entire hash after each run so you don't run into crap
     {
         delete $AHU{$_};
     }
+	undef %{$AHUmap};
 	for (keys %{$AHUmap})	#deletes entire hash after each run so you don't run into crap
     {
         delete ${$AHUmap}{$_};
