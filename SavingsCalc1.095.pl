@@ -1536,6 +1536,7 @@ while (my $inputfile = readdir(DIR))
 			unless ($active{$key})	#if any are false
 			{
 				$active{"activePercentage"} = 0;
+				return %active;  
 			}
 		}
 		my @fatalPath;
@@ -1584,15 +1585,9 @@ while (my $inputfile = readdir(DIR))
 		if($fatalpFailure == scalar(@fatalPath))
 		{
 			$active{"activePercentage"} = 0;
+			return %active;  
 		}
 		
-		if(exists $active{"activePercentage"})	#since this will only exist if there has been
-			#a previous required point failure, this will return activePercentage = 0
-			#this ensures this hash will always have all the points the
-			#analytic uses for calculation. Useful for diagnostic output
-		{
-			return %active;
-		}
 		my $activePercentageNumerator = 0;
 		my $activePercentageDenominator = (scalar (keys(%active)));
 		
@@ -1633,6 +1628,7 @@ while (my $inputfile = readdir(DIR))
 			unless ($active{$key})	#if any are false
 			{
 				$active{"activePercentage"} = 0;
+				return %active;  
 			}
 		}
 		
@@ -1644,6 +1640,7 @@ while (my $inputfile = readdir(DIR))
 			unless ($active{"VFD"}||$active{"CoilMeter"})	#if both are false. DeMorgans ftw
 			{
 				$active{"activePercentage"} = 0;
+				return %active;  
 			}
 		}		
 		else
@@ -1654,15 +1651,8 @@ while (my $inputfile = readdir(DIR))
 			unless ($active{"VFD"}||$active{"CFM"})	#if both are false. DeMorgans ftw
 			{
 				$active{"activePercentage"} = 0;
+				return %active;  
 			}
-		}
-		
-		if(exists $active{"activePercentage"})	#since this will only exist if there has been
-			#a previous required point failure, this will return activePercentage = 0
-			#this ensures this hash will always have all the points the
-			#analytic uses for calculation. Useful for diagnostic output
-		{
-			return %active;  
 		}
 		
 		foreach my $lists ($AHUmap->getpaths)
@@ -1723,7 +1713,8 @@ while (my $inputfile = readdir(DIR))
 		{
 			unless ($active{$key})	#if any are false
 			{
-				$active{"activePercentage"} = 0;
+				$active{"activePercentage"} = 0;  
+				return %active;
 			}
 		}
 		my @fatalPath;
@@ -1773,15 +1764,9 @@ while (my $inputfile = readdir(DIR))
 		if($fatalpFailure == scalar(@fatalPath))
 		{
 			$active{"activePercentage"} = 0;
-		}
-		
-		if(exists $active{"activePercentage"})	#since this will only exist if there has been
-			#a previous required point failure, this will return activePercentage = 0
-			#this ensures this hash will always have all the points the
-			#analytic uses for calculation. Useful for diagnostic output
-		{
 			return %active;
 		}
+		
 		my $activePercentageNumerator = 0;
 		my $activePercentageDenominator = (scalar (keys(%active)));
 		foreach my $key (keys(%active))
@@ -1824,7 +1809,7 @@ while (my $inputfile = readdir(DIR))
 		{
 			unless ($active{$key})	#if any are false
 			{
-				$active{"activePercentage"} = 0;
+				$active{"activePercentage"} = 0;  
 				return %active;
 			}
 		}
@@ -1861,7 +1846,8 @@ while (my $inputfile = readdir(DIR))
 		{
 			unless ($active{$key})	#if any are false
 			{
-				$active{"activePercentage"} = 0;
+				$active{"activePercentage"} = 0; 
+				return %active;
 			}
 		}
 		
@@ -1917,15 +1903,9 @@ while (my $inputfile = readdir(DIR))
 		if($fatalpFailure == scalar(@fatalPath))
 		{
 			$active{"activePercentage"} = 0;
-		}
-
-		if(exists $active{"activePercentage"})	#since this will only exist if there has been
-			#a previous required point failure, this will return activePercentage = 0
-			#this ensures this hash will always have all the points the
-			#analytic uses for calculation. Useful for diagnostic output
-		{
 			return %active;
 		}
+
 		my $activePercentageNumerator = 0;
 		my $activePercentageDenominator = (scalar (keys(%active)));
 		foreach my $key (keys(%active))
@@ -1965,7 +1945,8 @@ while (my $inputfile = readdir(DIR))
 		{
 			unless ($active{$key})	#if any are false
 			{
-				$active{"activePercentage"} = 0;
+				$active{"activePercentage"} = 0; 
+				return %active;
 			}
 		}
 		my @fatalPath;
@@ -2015,15 +1996,9 @@ while (my $inputfile = readdir(DIR))
 		if($fatalpFailure == scalar(@fatalPath))	#only if all paths were fatal
 		{
 			$active{"activePercentage"} = 0;
-		}
-		
-		if(exists $active{"activePercentage"})	#since this will only exist if there has been
-			#a previous required point failure, this will return activePercentage = 0
-			#this ensures this hash will always have all the points the
-			#analytic uses for calculation. Useful for diagnostic output
-		{
 			return %active;
 		}
+		
 		my $activePercentageNumerator = 0;
 		my $activePercentageDenominator = (scalar (keys(%active)));
 		foreach my $key (keys(%active))
@@ -4846,15 +4821,8 @@ while (my $inputfile = readdir(DIR))
 	close ($inz);
 	
 	undef %AHU;
-	for (keys %AHU)	#deletes entire hash after each run so you don't run into crap
-    {
-        delete $AHU{$_};
-    }
-	undef %{$AHUmap};
-	for (keys %{$AHUmap})	#deletes entire hash after each run so you don't run into crap
-    {
-        delete ${$AHUmap}{$_};
-    }
+	undef %{$AHUmap};	#deletes entire hash so they don't step on each others's toes
+	
 	$excel = 0;	#reset excel flag per file
 }
 closedir DIR;
