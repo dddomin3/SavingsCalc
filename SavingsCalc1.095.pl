@@ -4611,7 +4611,7 @@ while (my $inputfile = readdir(DIR))
 	my %algvalue; #directly store "AnomalyType => Value"
 	foreach my $wi (keys %alg) #Will create a new, single level hash where each key will be the alg/anomaly, and its value will literally be the value (avoidance cost)
 	{
-		$algvalue{$wi} = $alg{$wi}{"CompletedValue"} - $alg{$wi}{"OutstandingValue"};
+		$algvalue{$wi} = $alg{$wi}{"CompletedValue"} + $alg{$wi}{"OutstandingValue"};
 	}		
 	print Dumper \%algvalue;
 	my @algrow; #array will store top 8 Anomalies in order, for reference later (dont need TOTAL avoidable cost, need completed vs outstanding)
@@ -4884,3 +4884,4 @@ print Dumper \%equip;
 print Dumper \%ahuhash;
 
 close($diagTicket_save);
+
