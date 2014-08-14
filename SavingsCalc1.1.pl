@@ -763,7 +763,7 @@ if(-e "global.csv")
 		$laziness =~ s/  \( OK \)//g; #removes all OKs$laziness =~ s/  \( OK \)//g; #removes all OKs
 		$laziness =~ s/  \( Overwritten \)//g; #removes all Overwrittens
 #		$laziness =~ s/(  \( OK \)|\")//g; #removes all OKs AND QUOTES
-#		$laziness =~ s/\"//g; #removes all quotes
+		$laziness =~ s/\"//g; #removes all quotes
 		while ($laziness =~ s/,,/,NULL,/g){}; #replace empty values with NULL for future treatment
 		if($laziness =~ m/\(/)	#If there is another parenthesis, replace data with NULL.
 		{
@@ -976,7 +976,7 @@ while (my $inputfile = readdir(DIR))
 		$laziness =~ s/  \( Overridden \)//g; #removes all Overriddens
 		$laziness =~ s/  \( Filler Data \)//g; #removes all Filler Datas
 #		$laziness =~ s/(  \( OK \)|\")//g; #removes all OKs AND QUOTES
-#		$laziness =~ s/\"//g; #removes all quotes
+		$laziness =~ s/\"//g; #removes all quotes
 		while ($laziness =~ s/,,/,NULL,/g){}; #replace empty values with NULL for future treatment
 		if($laziness =~ m/\(/)	#If there is another parenthesis, replace data with NULL.
 		{
