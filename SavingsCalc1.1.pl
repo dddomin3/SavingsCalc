@@ -2107,15 +2107,14 @@ while (my $inputfile = readdir(DIR))
 			{
 				$header{"VFD"} = 1;
 				$header{"CFM"} = 1;
-			}
-			
-			foreach my $lists ($AHUmap->getpaths)
-			{
-				foreach my $valve (@{$lists})
+				foreach my $lists ($AHUmap->getpaths)
 				{
-					$header{$valve} = 1;
-					$header{$AHUmap->getvta($valve)} = 1;
-					$header{$AHUmap->getvtb($valve)} = 1;
+					foreach my $valve (@{$lists})
+					{
+						$header{$valve} = 1;
+						$header{$AHUmap->getvta($valve)} = 1;
+						$header{$AHUmap->getvtb($valve)} = 1;
+					}
 				}
 			}
 		}
