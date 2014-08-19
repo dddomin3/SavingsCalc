@@ -513,8 +513,8 @@ if (-e "HistoryConsole.csv")
 			else	#this can just be else, they are logically equiv
 			{			
 						
-				# #						$1-month								  		$2-Day  	$3-Year			$4-hr		 $5-Min		  		$6-Sec
-				$thing[1] =~ m/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+0?([0-3]?[0-9]),\s+0*?(\d*)\s+0*?([0-3]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])/;
+				# #						$1-month								  		$2-Day  		$3-Year				$4-hr			 $5-Min		  		$6-Sec
+				$thing[1] =~ m/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+0?([0-3]?[0-9])\s*,\s+0*?(\d*)\s+0*?([0-3]?[0-9])\s*:\s*([0-5]?[0-9])\s*:\s*([0-5]?[0-9])/;
 				my $month = 0;
 				my @monthnames = qw (Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec OMFGWTFBBQ);
 				for ( my $poo = 0; $poo < scalar (@monthnames); $poo++ )
