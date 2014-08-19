@@ -480,7 +480,7 @@ if (-e "HistoryConsole.csv")
 		
 			#####START TIME#####
 			
-			$thing[0] =~ m/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+0?([0-3]?[0-9]),\s+0*?(\d*)\s+0*?([0-3]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])/;
+			$thing[0] =~ m/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+0?([0-3]?[0-9])\s*,\s+0*?(\d*)\s+0*?([0-3]?[0-9])\s*:\s*([0-5]?[0-9])\s*:\s*([0-5]?[0-9])/;
 			my $month = 0;
 			
 			my @monthnames = qw (Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec OMFGWTFBBQ);
@@ -919,7 +919,7 @@ print ".\n";
 #goes through all files in current directory
 while (my $inputfile = readdir(DIR))
 {
-	if(!($inputfile =~ m/\.csv/)||($inputfile =~ m/_save\.csv/)||($inputfile =~ m/(Tree(AHU|Alg|Equip)|pointnames|AHUinfo|global|ImpactDays|Annualize|HistoryConsole(_NEW)?).csv/))	#NOTE: must add files here to be rejected
+	if(!($inputfile =~ m/\.csv$/)||($inputfile =~ m/_save\.csv$/)||($inputfile =~ m/(Tree(AHU|Alg|Equip)|pointnames|AHUinfo|global|ImpactDays|Annualize|HistoryConsole(_NEW)?).csv$/))	#NOTE: must add files here to be rejected
 	{
 		next;
 	}	#the above throws away non-csv files or already converted files.
