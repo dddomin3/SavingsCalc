@@ -1,4 +1,4 @@
-Work Order Quantity,78
+Work Order Quantity,72
 Annual Avoidable Cost,9349.56471304943
 Energy (kWh),222608.683644034
 Energy (gas),0
@@ -8,11 +8,11 @@ Current Month Completed Work Orders Quantity,0
 Current Month Outstanding Work Orders Quantity,0
 Current Month Completed Work Orders Value,0
 Current Month Outstanding Work Orders Value,0
-Carryover Month Completed Work Orders Quantity,39
+Carryover Month Completed Work Orders Quantity,33
 Carryover Month Outstanding Work Orders Quantity,39
 Carryover Month Completed Work Orders Value,9326.23843341675
 Carryover Month Outstanding Work Orders Value,23.3262796326746
-Lifetime Month Completed Work Orders Quantity,39
+Lifetime Month Completed Work Orders Quantity,33
 Lifetime Month Outstanding Work Orders Quantity,39
 Lifetime Month Completed Work Orders Value,9326.23843341675
 Lifetime Month Outstanding Work Orders Value,23.3262796326746
@@ -24,7 +24,7 @@ October 2013,0,0
 November 2013,0,0
 December 2013,0,0
 January 2014,0,0
-February 2014,39,0
+February 2014,33,0
 March 2014,0,0
 April 2014,0,0
 May 2014,0,39
