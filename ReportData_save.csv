@@ -1,6 +1,6 @@
 Work Order Quantity,78
-Annual Avoidable Cost,9584.30789127639
-Energy (kWh),228197.806935152
+Annual Avoidable Cost,9349.56471304943
+Energy (kWh),222608.683644034
 Energy (gas),0
 Energy (steam),0
 Carbon Dioxide (metric tons),
@@ -10,12 +10,12 @@ Current Month Completed Work Orders Value,0
 Current Month Outstanding Work Orders Value,0
 Carryover Month Completed Work Orders Quantity,39
 Carryover Month Outstanding Work Orders Quantity,39
-Carryover Month Completed Work Orders Value,9564.36585591189
-Carryover Month Outstanding Work Orders Value,19.9420353645013
+Carryover Month Completed Work Orders Value,9326.23843341675
+Carryover Month Outstanding Work Orders Value,23.3262796326746
 Lifetime Month Completed Work Orders Quantity,39
 Lifetime Month Outstanding Work Orders Quantity,39
-Lifetime Month Completed Work Orders Value,9564.36585591189
-Lifetime Month Outstanding Work Orders Value,19.9420353645013
+Lifetime Month Completed Work Orders Value,9326.23843341675
+Lifetime Month Outstanding Work Orders Value,23.3262796326746
 Series Name,Completed,Outstanding
 July 2013,0,0
 August 2013,0,0
@@ -31,15 +31,15 @@ May 2014,0,39
 June 2014,0,0
 Leaky Valve,8800.91645510619,0
 Simultaneous Heating and Cooling,246.11740109188,0
-Stuck Damper,241.825675007062,0
-Leaky Damper,225.393825093789,0
+Leaky Damper,227.050103236181,0
 Out of Occupancy,11.4218375281114,19.9420353645013
 DAT Deviation,27.7032086476603,0
 DSP Deviation,10.9874534371933,0
+Stuck Damper,2.04197436953294,3.38424426817333
 Improper Economizing,0,0
-AHU5,9231.64843475451,0
-AHU1,249.991595441094,19.9420353645013
-AHU4,82.7258257162844,0
+AHU5,9110.65733953369,3.38424426817333
+AHU1,192.8186648827,19.9420353645013
+AHU4,22.762429000364,0
 NULL,0,0
 NULL,0,0
 NULL,0,0

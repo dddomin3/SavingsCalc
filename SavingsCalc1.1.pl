@@ -1345,8 +1345,11 @@ while (my $inputfile = readdir(DIR))
 		
 	#The below will use AHUside OA sensors. If these are not defined, it will try to use the global values.
 	our @OAT = SetPlainArray("OAT");
+		$AHU{"OAT"} = \@OAT;	#three
 	our @OAE = SetPlainArray("OAE");
+		$AHU{"OAE"} = \@OAE;	#goddamn lines
 	our @OAH = SetPlainArray("OAH");
+		$AHU{"OAH"} = \@OAH;	#of code
 
 	our @DSP = SetPlainArray("DSP");
 		our @DSPSP = SetPlainArray("DSPSP");
