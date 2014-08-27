@@ -371,9 +371,9 @@ if (-e "HistoryConsole.csv")
 	my $href;
 	
 
-	open(my $fh, '<', 'HistoryConsole.csv') or die "Could not open file";
-	open(my $ff, '>', 'HistoryConsole_NEW.csv');
-	while (<$fh>)
+	open(my $historyConsoleIn, '<', 'HistoryConsole.csv') or die "Could not open file";
+	open(my $historyConsoleOut, '>', 'HistoryConsole_NEW.csv');
+	while (<$historyConsoleIn>)
 	{
 		$num++;
 		my $line = $_; #one row at a time
@@ -467,9 +467,9 @@ if (-e "HistoryConsole.csv")
 			}
 			foreach my $dennis (@header)
 			{
-				print $ff $info[$dennis].",";
+				print $historyConsoleOut $info[$dennis].",";
 			}
-			print $ff "\n";
+			print $historyConsoleOut "\n";
 			
 
 		}
@@ -535,16 +535,16 @@ if (-e "HistoryConsole.csv")
 				$sox = $ya;
 			}
 			#####Print an organized version of the original file#####
-			print $ff $info[$a];
-			print $ff ",";
-			print $ff $info[$b];
-			print $ff ",";
-			print $ff $info[$c];
-			print $ff ",";
-			print $ff $pats;
-			print $ff ",";
-			print $ff $sox;
-			print $ff ",";
+			print $historyConsoleOut $info[$a];
+			print $historyConsoleOut ",";
+			print $historyConsoleOut $info[$b];
+			print $historyConsoleOut ",";
+			print $historyConsoleOut $info[$c];
+			print $historyConsoleOut ",";
+			print $historyConsoleOut $pats;
+			print $historyConsoleOut ",";
+			print $historyConsoleOut $sox;
+			print $historyConsoleOut ",";
 			###if Anomaly is blank or N/A, insert null. Else if don't change###
 			if (($info[$f] eq "") || ($info[$f] eq "N/A"))
 			{
@@ -554,10 +554,10 @@ if (-e "HistoryConsole.csv")
 			{
 				$bigpapi = $info[$f];
 			}
-			print $ff $bigpapi;
-			print $ff ",";
-			print $ff $info[$g];
-			print $ff ",";
+			print $historyConsoleOut $bigpapi;
+			print $historyConsoleOut ",";
+			print $historyConsoleOut $info[$g];
+			print $historyConsoleOut ",";
 			###if Cause is blank or N/A, insert null. Else if don't change###
 
 			if (($info[$h] eq "") || ($info[$h] eq "N/A"))
@@ -568,8 +568,8 @@ if (-e "HistoryConsole.csv")
 			{
 				$sanu = $info[$h];
 			}
-			print $ff $sanu;
-			print $ff ",";
+			print $historyConsoleOut $sanu;
+			print $historyConsoleOut ",";
 			###if Effect is blank or N/A, insert NULL. Else if don't change###
 			
 			if (($info[$i] eq "") || ($info[$i] eq "N/A"))
@@ -581,26 +581,26 @@ if (-e "HistoryConsole.csv")
 				$gronk = $info[$i];
 			}
 			
-			print $ff $gronk;
+			print $historyConsoleOut $gronk;
 			
-			print $ff ",";
-			print $ff $info[$j];
-			print $ff ",";
-			print $ff $info[$k];
-			print $ff ",";
+			print $historyConsoleOut ",";
+			print $historyConsoleOut $info[$j];
+			print $historyConsoleOut ",";
+			print $historyConsoleOut $info[$k];
+			print $historyConsoleOut ",";
 			
 			#This is for the comment column#
 			
 			if ($info[$l] eq "LOL\n") #for comments if it was replaced
 			{
-				print $ff $thing[2];
+				print $historyConsoleOut $thing[2];
 				$brady = join(',',$thing[2]);
-				print $ff "\n";
+				print $historyConsoleOut "\n";
 			}
 			
 			else #for comments if it was NOT replaced
 			{
-				print $ff ($info[$l]);
+				print $historyConsoleOut ($info[$l]);
 				$brady = join(',',$info[$l]);
 			}	
 					
@@ -616,8 +616,8 @@ if (-e "HistoryConsole.csv")
 	$ticket = \%rutgers;
 	#print $diagTicket_save Dumper \%rutgers; #same shit
 	
-	close $fh;
-	close $ff;
+	close $historyConsoleIn;
+	close $historyConsoleOut;
 } 
 else {die "You forgot HistoryConsole.csv";}
 print ".\n";
@@ -769,7 +769,7 @@ if(-e "global.csv")
 		{
 			$laziness =~ s/[^,]*?\(.*?\),/NULL,/g;
 		} 
-		#print CONV $laziness; #if nothing wrong with line, add it to converted file.
+		#print $assetDataFileOut $laziness; #if nothing wrong with line, add it to converted file.
 #----------Hash Population----------V
 		
 		$colnum = 0;
@@ -929,13 +929,13 @@ while (my $inputfile = readdir(DIR))
 	$outputfile =~ s/\.csv/_save\.csv/;
 		#renames output file name to inFILE.csv to inFILE_save.csv
 
-	open(my $inz, "<", $inputfile) or die $!;
-	open(CONV, ">", $outputfile) or die $!;
+	open(my $assetDataFileIn, "<", $inputfile) or die $!;
+	open(my $assetDataFileOut, ">", $outputfile) or die $!;
 	
 	our %AHU;	#makes the AHU hash global. Needs to be here, since redefinition of it deletes the old AHU hash it its entirety
 	our $AHUmap = AHU->new();
 	my @colkey;	#array keep track of what point is in which column
-	my $firstline = <$inz>;
+	my $firstline = <$assetDataFileIn>;
 	my $colnum = 0;
 	our $AHUname = "";	#global AHU name
 	my %savings;
@@ -954,18 +954,18 @@ while (my $inputfile = readdir(DIR))
 	foreach (@colkey)
 	{
 		$AHU{$_} = [];
-		if($_ ne "NULL") { print CONV "$_,"; }
+		if($_ ne "NULL") { print $assetDataFileOut "$_,"; }
 	}
 	foreach (@globalcolkey)
 	{
-		print CONV "$_,";
+		print $assetDataFileOut "$_,";
 	}
-	print CONV "\n";
+	print $assetDataFileOut "\n";
 	my $firsttime = 1;	#figures out if its the first, or row of file.
 	my $prevtime; #DateTime. Stores the value of the previous runs time stamp
 	my $thisyear = $datayear; #so each AHU has it's own year "bubble". otherwise, if this AHU needs a year increment, it'll increment the next AHUs starting year, lol.
 #----------Header parsing-----------^
-	while (<$inz>)
+	while (<$assetDataFileIn>)
 	{
 #----------Data Treatment-----------V
 		my $laziness = $_;
@@ -982,7 +982,7 @@ while (my $inputfile = readdir(DIR))
 		{
 			$laziness =~ s/[^,]*?\(.*?\),/NULL,/g; 
 		} 
-		#print CONV $laziness; #if nothing wrong with line, add it to converted file.
+		#print $assetDataFileOut $laziness; #if nothing wrong with line, add it to converted file.
 #----------Hash Population----------V
 		
 		$colnum = 0;
@@ -4797,30 +4797,30 @@ while (my $inputfile = readdir(DIR))
 		{
 			if($j < scalar( @{$AHU{"TT"}}))
 			{
-				if($poo eq "TT") { my $timestring = $AHU{"TT"}[$j]->format_cldr( "MM'/'dd'/'yyyy HH':'mm" ); print CONV "$timestring,";}
-				elsif($poo ne "NULL") { print CONV "$AHU{$poo}[$j],"; }
+				if($poo eq "TT") { my $timestring = $AHU{"TT"}[$j]->format_cldr( "MM'/'dd'/'yyyy HH':'mm" ); print $assetDataFileOut "$timestring,";}
+				elsif($poo ne "NULL") { print $assetDataFileOut "$AHU{$poo}[$j],"; }
 			}
 			else
 			{
-				print CONV "NULL,";
+				print $assetDataFileOut "NULL,";
 			}
 		}
 		foreach my $poo (@globalcolkey)
 		{
 			if($j < scalar( @{$global{"TT"}}))
 			{
-				if($poo eq "TT") { my $timestring = $global{"TT"}[$j]->format_cldr( "MM'/'dd'/'yyyy HH':'mm" ); print CONV "$timestring,";}
-				elsif($poo ne "NULL") { print CONV "$global{$poo}[$j],"; }
+				if($poo eq "TT") { my $timestring = $global{"TT"}[$j]->format_cldr( "MM'/'dd'/'yyyy HH':'mm" ); print $assetDataFileOut "$timestring,";}
+				elsif($poo ne "NULL") { print $assetDataFileOut "$global{$poo}[$j],"; }
 			}
 			else
 			{
-				print CONV "NULL,";
+				print $assetDataFileOut "NULL,";
 			}
 		}
-		print CONV "\n";
+		print $assetDataFileOut "\n";
 	}
-	close (CONV);
-	close ($inz);
+	close ($assetDataFileOut);
+	close ($assetDataFileIn);
 	
 	undef %AHU;
 	undef %{$AHUmap};	#deletes entire hash so they don't step on each others's toes
