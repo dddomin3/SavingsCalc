@@ -115,7 +115,7 @@ my $SIBrit = <STDIN>;
 if ($SIBrit =~ m/Y/)
 {
 	#print "British Units are the best, Ol' Chap!\n";
-	print "THIS IS AMERICA!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+	print "This site has American Units.\n";
 }
 else 
 {
@@ -289,8 +289,8 @@ if (-e "ImpactDays.csv")	#gets all the annualization constants, and shoves them 
 	my $counter;
 	my $tempfac;
 
-	open(my $filehandle, '<', 'ImpactDays.csv') or die "Could not open file";
-	while (<$filehandle>)
+	open(my $impactDaysDoc, '<', 'ImpactDays.csv') or die "Could not open file";
+	while (<$impactDaysDoc>)
 	{
 		$num++;
 		my $line = $_;
@@ -3572,8 +3572,8 @@ while (my $inputfile = readdir(DIR))
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
-					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/) 
-					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  )
+					|| ( (($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/) || ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Failure or in Manual/) ) 
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) ) )
 					{
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings elec"} = 0;		#forreal.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Realized Savings gas"} = 0;		#forreal.
@@ -4078,8 +4078,8 @@ while (my $inputfile = readdir(DIR))
 					}
 					elsif (  ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Anomaly"} =~ m/DSP Above Set Point/) #Duct Static Pressure Deviation?
 					
-					|| ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/) 
-					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) )  )
+					|| ( ( ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Control/) || ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Cause"} =~ m/AHU VFD Failure or in Manual/) ) 
+					&& ($ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Effect"} =~ m/Duct Static Pressure Greater/ ) ) )
 					{
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings elec"} = 0;		#fofake.
 						$ticket->{$sitename}->{$AHUname}->{$ticketLevel}->{"Potential Savings gas"} = 0;		#fofake.
