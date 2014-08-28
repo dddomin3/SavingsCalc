@@ -4829,13 +4829,13 @@ while (my $inputfile = readdir(DIR))
 }
 closedir DIR;
 close DIAG;
-print "\n\n\t\t+-------------------------------------------------+\n";
+print "\n\n\t\t+-------------------------------------------------+\n\a";
 print "\t\t|diag.txt pointnames.csv totalsavings_save.csv and|\n"; 
 print "\t\t|    per AHU savings files have been generated.   |\n";
 print "\t\t|  Check diag.txt for all console outputs as well |\n";
 print "\t\t|  as additional data and warnings. DIAG MUST BE  |\n";
 print "\t\t|CHECKED WITH EVERY RUN SO AS TO CATCH ANY ISSUES.|\n";
-print "\t\t+-------------------------------------------------+\n\n\t\t\t       Press enter to close"; 
+print "\t\t+-------------------------------------------------+\n\n\t\t\t\a       Press enter to close"; 
 <STDIN>; #This is to actually capture the enter to close
 
 #Closing Tasks
