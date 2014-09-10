@@ -1938,7 +1938,6 @@ while (my $inputfile = readdir(DIR))
 		my $CFM = &MakeCFM($i, MakeVFD($i,REALLYMakeVFD($i, $MaxCFM)), $MaxCFM);
 		
 		my %active = (
-			"MAT" => ( looks_like_number($MAT[$i]) > 0),	#MAT
 			"SCH" => ( looks_like_number($SCH[$i]) > 0),
 			"SFS" => ( looks_like_number(&FanOn($i)) > 0),
 			"CFM" => ( looks_like_number($CFM) > 0)
